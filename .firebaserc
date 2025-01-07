@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "flutterecommercetemplate-72969"
-  }
+    "default": "tu-tienda-tecnologica",
+    "Tecnology": "tu-tienda-tecnologica"
+  },
+  "targets": {},
+  "etags": {}
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:ecommerce_int2/models/product.dart';
@@ -23,11 +24,26 @@ class _ProductCardState extends State<ProductCard> {
   int _currentImageIndex = 0; // Índice para manejar la imagen actual
   double _averageRating = 4.5; // Simulación de promedio de calificación inicial
   int _ratingCount = 20; // Simulación del número de opiniones
+  Timer? _imageTimer; // Timer para cambiar las imágenes automáticamente
 
-  // Cambiar la imagen cuando se presiona
-  void _changeImage() {
-    setState(() {
-      _currentImageIndex = (_currentImageIndex + 1) % widget.product.imageUrls.length;
+  @override
+  void initState() {
+    super.initState();
+    _startImageTimer();
+  }
+
+  @override
+  void dispose() {
+    _imageTimer?.cancel(); // Detener el Timer cuando el widget se destruye
+    super.dispose();
+  }
+
+  // Inicia el temporizador para cambiar las imágenes automáticamente
+  void _startImageTimer() {
+    _imageTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+      setState(() {
+        _currentImageIndex = (_currentImageIndex + 1) % widget.product.imageUrls.length;
+      });
     });
   }
 
@@ -58,7 +74,6 @@ class _ProductCardState extends State<ProductCard> {
           children: <Widget>[
             // Imagen del producto con cambio al tocar
             GestureDetector(
-              onTap: _changeImage,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: LayoutBuilder(

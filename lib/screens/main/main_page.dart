@@ -20,8 +20,8 @@ import 'components/tab_view.dart';
 
 List<String> timelines = [
   'Destacado Semana',
-  'Mejor de Octubre Helloween',
-  'Mejor de 2024',
+  'lo ultimo del mes',
+  'Mejor de 2025',
 ];
 String selectedTimeline = 'Presentado Semanalmente';
 
