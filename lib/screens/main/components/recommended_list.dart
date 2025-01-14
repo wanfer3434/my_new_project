@@ -1,9 +1,10 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:ecommerce_int2/app_properties.dart';
 import 'package:ecommerce_int2/models/product.dart';
 import 'package:ecommerce_int2/screens/product/product_page.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:flutter/material.dart';
 
 class RecommendedList extends StatefulWidget {
   @override
@@ -12,36 +13,57 @@ class RecommendedList extends StatefulWidget {
 
 class _RecommendedListState extends State<RecommendedList> {
   final List<Product> products = [
-    Product(id: '1', imageUrls: ['https://i.imgur.com/4mejGU4.jpg',
-      'https://i.imgur.com/3Lk2fcw.jpg'], name: 'Forro con cadena', description: 'Dieño para Dama', price: 30000),
-    Product(id: '2', imageUrls: ['https://i.imgur.com/G4z0HpV.png',
-      'https://i.imgur.com/Xf2TEUR.png'], name: 'Vidrios para Pantalla', description: 'A70', price: 1000),
-    Product(id: '3', imageUrls: ['https://i.imgur.com/5zqRhBS.png'], name: 'Botones', description: 'Astronautas', price: 2000),
-    Product(id: '4', imageUrls: ['https://i.imgur.com/3Lk2fcw.jpg',
-      'https://i.imgur.com/k16kyo7.png'], name: 'cadena de colores', description: 'cadena', price: 5000),
-    Product(id: '5', imageUrls: ['https://i.imgur.com/t1mUHdd.jpg',
-      'https://imgur.com/a/3kpNSB2'], name: 'Billete de Colección', description: 'Billete de CINCO PESOS ORO', price: 50000),
-    Product(id: '6', imageUrls: ['https://i.imgur.com/zaMg63b.jpg'], name: 'Lentes Para Camara', description: 'Lisos y de Piedra', price: 5000),
-    Product(id: '7', imageUrls: ['https://firebasestorage.googleapis.com/v0/b/flutterecommercetemplate-72969.appspot.com/o/Iphone_Silicone.jpg?alt=media&token=c673ce14-832e-4aa3-b9cb-fece81c28c7b',
-      'https://i.imgur.com/ziPFySl.jpg',
-      'https://i.imgur.com/VyzRYec.jpg'], name: 'Iphone', description: 'Forro Silicone Case', price: 20000),
-    Product(id: '8', imageUrls: ['https://firebasestorage.googleapis.com/v0/b/flutterecommercetemplate-72969.appspot.com/o/soporte_plano_color_para_celular.jpg?alt=media&token=2dc611f5-7e21-4284-b5a0-2217a772f504'], name: 'Soporte Móvil', description: 'Soporte plao Color', price: 15000),
-    Product(id: '9', imageUrls: ['https://firebasestorage.googleapis.com/v0/b/flutterecommercetemplate-72969.appspot.com/o/samsung%2025w.jpg?alt=media&token=6aeca5f8-feb1-48de-b6ee-e0c76cd786a1',
-      'https://i.imgur.com/pJ31feH.jpg',
-      'https://i.imgur.com/c5QE6kL.jpg'], name: 'Adaptador', description: 'Memoria Usb', price: 5000),
+    Product(
+        id: '1',
+        imageUrls: ['https://i.imgur.com/4mejGU4.jpg', 'https://i.imgur.com/3Lk2fcw.jpg'],
+        name: 'Forro con cadena',
+        description: 'Diseño para Dama',
+        price: 30000),
+    Product(
+        id: '2',
+        imageUrls: ['https://i.imgur.com/G4z0HpV.png', 'https://i.imgur.com/Xf2TEUR.png'],
+        name: 'Vidrios para Pantalla',
+        description: 'A70',
+        price: 1000),
+    Product(
+        id: '3',
+        imageUrls: ['https://i.imgur.com/5zqRhBS.png'],
+        name: 'Botones',
+        description: 'Astronautas',
+        price: 2000),
+    // Agrega más productos aquí...
   ];
 
-  // Variables para manejar la calificación de productos
   Map<String, double> _currentRatings = {};
   Map<String, int> _ratingCounts = {};
+  late List<int> _currentImageIndices;
+  Timer? _imageChangeTimer;
 
   @override
   void initState() {
     super.initState();
+
+    // Inicializar índices de imágenes y calificaciones
+    _currentImageIndices = List.generate(products.length, (_) => 0);
     products.forEach((product) {
-      _currentRatings[product.id] = 4.5; // Calificación predeterminada
-      _ratingCounts[product.id] = 200; // Opiniones predeterminadas
+      _currentRatings[product.id] = 4.5;
+      _ratingCounts[product.id] = 200;
     });
+
+    // Configurar el temporizador para cambiar las imágenes automáticamente
+    _imageChangeTimer = Timer.periodic(Duration(seconds: 3), (timer) {
+      setState(() {
+        for (int i = 0; i < products.length; i++) {
+          _currentImageIndices[i] = (_currentImageIndices[i] + 1) % products[i].imageUrls.length;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _imageChangeTimer?.cancel(); // Cancelar el temporizador al salir
+    super.dispose();
   }
 
   void _saveRating(String productId, double rating) {
@@ -86,7 +108,7 @@ class _RecommendedListState extends State<RecommendedList> {
               child: Container(
                 padding: EdgeInsets.all(16.0),
                 child: MasonryGridView.count(
-                  physics: BouncingScrollPhysics(), // Permite el desplazamiento
+                  physics: BouncingScrollPhysics(),
                   padding: EdgeInsets.zero,
                   crossAxisCount: 2,
                   itemCount: products.length,
@@ -119,9 +141,9 @@ class _RecommendedListState extends State<RecommendedList> {
                               Hero(
                                 tag: product.imageUrls[0],
                                 child: Image.network(
-                                  product.imageUrls[0],
+                                  product.imageUrls[_currentImageIndices[index]],
                                   fit: BoxFit.cover,
-                                  height: constraints.maxWidth < 600 ? 190 : 300, // Ajuste dinámico
+                                  height: constraints.maxWidth < 600 ? 190 : 300,
                                   width: double.infinity,
                                   errorBuilder: (context, error, stackTrace) =>
                                       Icon(Icons.error),
@@ -159,7 +181,6 @@ class _RecommendedListState extends State<RecommendedList> {
                                       ),
                                     ),
                                     SizedBox(height: 0.7),
-                                    // Barra de calificación
                                     RatingBar.builder(
                                       initialRating: _currentRatings[product.id]!,
                                       minRating: 1,
@@ -176,7 +197,6 @@ class _RecommendedListState extends State<RecommendedList> {
                                       },
                                     ),
                                     SizedBox(height: 0.5),
-                                    // Mostrar calificación promedio y número de opiniones
                                     Text(
                                       'Promedio: ${_currentRatings[product.id]} (${_ratingCounts[product.id]} opiniones)',
                                       style: TextStyle(
