@@ -69,6 +69,7 @@ class _ProductCardState extends State<ProductCard> {
           borderRadius: BorderRadius.all(Radius.circular(10)),
           color: Colors.white30,
         ),
+        child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -165,6 +166,7 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
