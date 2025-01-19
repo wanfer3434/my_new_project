@@ -16,8 +16,6 @@ import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
 
-
-
 List<String> timelines = [
   'Destacado Semana',
   'lo ultimo del mes',
@@ -253,13 +251,3 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
