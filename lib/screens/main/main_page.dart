@@ -166,7 +166,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: !isSearching
-            ? Text('you store')
+            ? Text('Tu Tienda')
             : TextField(
           controller: searchController,
           style: TextStyle(color: Colors.black),
