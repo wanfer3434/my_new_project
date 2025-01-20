@@ -231,7 +231,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         child: Column(
                           children: [
                             _buildProductList(), // Lista de productos.
-                            SizedBox(height: 16), // Espacio entre elementos.
+                            SizedBox(height: 4), // Espacio entre elementos.
                             tabBar, // TabBar adicional.
                           ],
                         ),
