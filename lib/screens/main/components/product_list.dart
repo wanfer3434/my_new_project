@@ -12,7 +12,7 @@ class ProductList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double cardHeight = MediaQuery.of(context).size.height / 2.90;
+    double cardHeight = MediaQuery.of(context).size.height / 2.0;
     double cardWidth = MediaQuery.of(context).size.width / 2.5;
 
     return SizedBox(
