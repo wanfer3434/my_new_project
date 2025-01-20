@@ -30,7 +30,7 @@ class TabView extends StatelessWidget {
             children: [
               // Lista de categorías
               Container(
-                height: 90, // Altura fija para el carrusel de categorías
+                height: 150, // Altura fija para el carrusel de categorías
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
