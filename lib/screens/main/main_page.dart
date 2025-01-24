@@ -10,17 +10,15 @@ import '../../models/local_product_list.dart';
 import '../category/category_list_page.dart';
 import '../chat_page.dart';
 import '../service/chat_service.dart';
-import 'components/AnotherPage.dart';
+import 'components/another_page.dart';
 import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
 
-
-
 List<String> timelines = [
   'Destacado Semana',
-  'lo ultimo del mes',
+  'Lo último del mes',
   'Mejor de 2025',
 ];
 String selectedTimeline = 'Presentado Semanalmente';
@@ -57,11 +55,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void _filterSearchResults(String query) {
     List<Product> tempList = [];
     if (query.isNotEmpty) {
-      products.forEach((product) {
+      for (var product in products) {
         if (product.name.toLowerCase().contains(query.toLowerCase())) {
           tempList.add(product);
         }
-      });
+      }
     } else {
       tempList.addAll(products);
     }
@@ -85,7 +83,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     if (isSearching) {
       _filterSearchResults(searchController.text);
     }
-
     return ProductList(
       products: isSearching ? searchResults : products,
     );
@@ -95,91 +92,41 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     Widget topHeader = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Flexible(
+      children: timelines.map((timeline) {
+        return Flexible(
           child: InkWell(
             onTap: () {
               setState(() {
-                selectedTimeline = timelines[0];
+                selectedTimeline = timeline;
               });
             },
             child: Text(
-              timelines[0],
-              style: TextStyle(
-                fontSize: timelines[0] == selectedTimeline ? 20 : 14,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ),
-        Flexible(
-          child: InkWell(
-            onTap: () {
-              setState(() {
-                selectedTimeline = timelines[1];
-              });
-            },
-            child: Text(
-              timelines[1],
+              timeline,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: timelines[1] == selectedTimeline ? 20 : 14,
+                fontSize: timeline == selectedTimeline ? 20 : 14,
                 color: Colors.grey,
               ),
             ),
           ),
-        ),
-        Flexible(
-          child: InkWell(
-            onTap: () {
-              setState(() {
-                selectedTimeline = timelines[2];
-              });
-            },
-            child: Text(
-              timelines[2],
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: timelines[2] == selectedTimeline ? 20 : 14,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ),
-      ],
+        );
+      }).toList(),
     );
-
-    Widget tabBar = TabBar(
-      tabs: [
-        Tab(text: 'Tendencia'),
-        Tab(text: 'Deportes'),
-        Tab(text: 'Audífonos'),
-        Tab(text: 'Inalámbricos'),
-        Tab(text: 'Bluetooth'),
-      ],
-      labelStyle: TextStyle(fontSize: 16.0),
-      unselectedLabelStyle: TextStyle(fontSize: 14.0),
-      labelColor: Colors.grey,
-      unselectedLabelColor: Color.fromRGBO(0, 0, 0, 0.5),
-      isScrollable: true,
-      controller: tabController,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: !isSearching
             ? Text('Tu Tienda')
             : TextField(
-          controller: searchController,
-          style: TextStyle(color: Colors.black),
-          decoration: InputDecoration(
-            hintText: 'Buscar...',
-            hintStyle: TextStyle(color: Colors.black),
-            border: InputBorder.none,
-          ),
-          onChanged: _filterSearchResults,
-        ),
-        actions: <Widget>[
+                controller: searchController,
+                style: TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  hintText: 'Buscar...',
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+                onChanged: _filterSearchResults,
+              ),
+        actions: [
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {
@@ -203,16 +150,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         painter: MainBackground(),
         child: TabBarView(
           controller: bottomTabController,
-          physics: NeverScrollableScrollPhysics(), // Mantén esto si no quieres swipe en tabs.
-          children: <Widget>[
+          physics: NeverScrollableScrollPhysics(),
+          children: [
             SafeArea(
               child: NestedScrollView(
-                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
                     SliverAppBar(
-                      expandedHeight: 250, // Ajusta la altura del banner
+                      expandedHeight: 250,
                       pinned: true,
-                      primary: false, // Permite superposición con la barra de estado
                       flexibleSpace: FlexibleSpaceBar(
                         background: BannerWidget(
                           imageUrl: 'https://i.imgur.com/GaEsmRG.png',
@@ -229,14 +175,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                     ),
                     SliverToBoxAdapter(child: topHeader),
                     SliverToBoxAdapter(
-                      child: SingleChildScrollView( // Envuelve en scroll si es necesario.
-                        child: Column(
-                          children: [
-                            _buildProductList(), // Lista de productos.
-                            SizedBox(height: 16), // Espacio entre elementos.
-                            tabBar, // TabBar adicional.
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          _buildProductList(),
+                          SizedBox(height: 8),
+                        ],
                       ),
                     ),
                   ];
