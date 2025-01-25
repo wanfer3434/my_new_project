@@ -10,7 +10,7 @@ import '../../models/local_product_list.dart';
 import '../category/category_list_page.dart';
 import '../chat_page.dart';
 import '../service/chat_service.dart';
-import 'components/another_page.dart';
+import 'components/AnotherPage.dart';
 import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
@@ -31,10 +31,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   late TabController tabController;
   late TabController bottomTabController;
-  TextEditingController searchController = TextEditingController();
-  bool isSearching = false;
   List<Product> products = [];
-  List<Product> searchResults = [];
 
   @override
   void initState() {
@@ -48,85 +45,75 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void dispose() {
     tabController.dispose();
     bottomTabController.dispose();
-    searchController.dispose();
     super.dispose();
   }
 
-  void _filterSearchResults(String query) {
-    List<Product> tempList = [];
-    if (query.isNotEmpty) {
-      for (var product in products) {
-        if (product.name.toLowerCase().contains(query.toLowerCase())) {
-          tempList.add(product);
-        }
-      }
-    } else {
-      tempList.addAll(products);
-    }
-    setState(() {
-      searchResults.clear();
-      searchResults.addAll(tempList);
-    });
-  }
-
-  void _toggleSearch() {
-    setState(() {
-      isSearching = !isSearching;
-      if (!isSearching) {
-        searchController.clear();
-        _filterSearchResults('');
-      }
-    });
-  }
-
   Widget _buildProductList() {
-    if (isSearching) {
-      _filterSearchResults(searchController.text);
-    }
-    return ProductList(
-      products: isSearching ? searchResults : products,
-    );
+    return ProductList(products: products);
   }
 
   @override
   Widget build(BuildContext context) {
     Widget topHeader = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: timelines.map((timeline) {
-        return Flexible(
+      children: <Widget>[
+        Flexible(
           child: InkWell(
             onTap: () {
               setState(() {
-                selectedTimeline = timeline;
+                selectedTimeline = timelines[0];
               });
             },
             child: Text(
-              timeline,
-              textAlign: TextAlign.center,
+              timelines[0],
               style: TextStyle(
-                fontSize: timeline == selectedTimeline ? 20 : 14,
+                fontSize: timelines[0] == selectedTimeline ? 20 : 14,
                 color: Colors.grey,
               ),
             ),
           ),
-        );
-      }).toList(),
+        ),
+        Flexible(
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                selectedTimeline = timelines[1];
+              });
+            },
+            child: Text(
+              timelines[1],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: timelines[1] == selectedTimeline ? 20 : 14,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+        Flexible(
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                selectedTimeline = timelines[2];
+              });
+            },
+            child: Text(
+              timelines[2],
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: timelines[2] == selectedTimeline ? 20 : 14,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
+
     return Scaffold(
       appBar: AppBar(
-        title: !isSearching
-            ? Text('Tu Tienda')
-            : TextField(
-                controller: searchController,
-                style: TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  hintText: 'Buscar...',
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: InputBorder.none,
-                ),
-                onChanged: _filterSearchResults,
-              ),
-        actions: [
+        title: Text('Tu Tienda'),
+        actions: <Widget>[
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {
@@ -137,11 +124,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           ),
           IconButton(
             icon: SvgPicture.asset(
-              'assets/icons/search_icon.svg',
+              'assets/icons/chatbot_icon.svg', // Cambia a tu ícono de chatbot.
               height: 24,
               width: 24,
             ),
-            onPressed: _toggleSearch,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => ChatPage()), // Página del chatbot.
+              );
+            },
           ),
         ],
       ),
@@ -151,14 +142,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         child: TabBarView(
           controller: bottomTabController,
           physics: NeverScrollableScrollPhysics(),
-          children: [
+          children: <Widget>[
             SafeArea(
               child: NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
+                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
                     SliverAppBar(
                       expandedHeight: 250,
                       pinned: true,
+                      primary: false,
                       flexibleSpace: FlexibleSpaceBar(
                         background: BannerWidget(
                           imageUrl: 'https://i.imgur.com/GaEsmRG.png',
@@ -174,14 +166,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                       ),
                     ),
                     SliverToBoxAdapter(child: topHeader),
-                    SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          _buildProductList(),
-                          SizedBox(height: 8),
-                        ],
-                      ),
-                    ),
+                    SliverToBoxAdapter(child: _buildProductList()),
                   ];
                 },
                 body: TabView(tabController: tabController),
