@@ -15,6 +15,7 @@ import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
+import 'components/chat_page.dart';
 
 List<String> timelines = [
   'Destacado Semana',
