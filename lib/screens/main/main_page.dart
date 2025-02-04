@@ -15,13 +15,16 @@ import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
+import 'components/chat_page.dart';
+import 'components/brand_slider.dart';
+
 
 List<String> timelines = [
   'Destacado Semana',
-  'Lo último del Mes',
+  'Lo último del mes',
   'Mejor de 2025',
 ];
-String selectedTimeline = 'Destacado Semana';
+String selectedTimeline = 'Presentado Semanalmente';
 
 class MainPage extends StatefulWidget {
   @override
@@ -31,10 +34,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   late TabController tabController;
   late TabController bottomTabController;
-  TextEditingController searchController = TextEditingController();
-  bool isSearching = false;
   List<Product> products = [];
-  List<Product> searchResults = [];
 
   @override
   void initState() {
@@ -48,103 +48,74 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void dispose() {
     tabController.dispose();
     bottomTabController.dispose();
-    searchController.dispose();
     super.dispose();
   }
 
-  void _filterSearchResults(String query) {
-    List<Product> tempList = [];
-    if (query.isNotEmpty) {
-      for (var product in products) {
-        if (product.name.toLowerCase().contains(query.toLowerCase())) {
-          tempList.add(product);
-        }
-      }
-    } else {
-      tempList.addAll(products);
-    }
-    setState(() {
-      searchResults.clear();
-      searchResults.addAll(tempList);
-    });
-  }
-
-  void _toggleSearch() {
-    setState(() {
-      isSearching = !isSearching;
-      if (!isSearching) {
-        searchController.clear();
-        _filterSearchResults('');
-      }
-    });
-  }
-
   Widget _buildProductList() {
-    if (isSearching) {
-      _filterSearchResults(searchController.text);
-    }
-
-    return ProductList(
-      products: isSearching ? searchResults : products,
-    );
+    return ProductList(products: products);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Header con opciones de línea de tiempo
     Widget topHeader = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: timelines.map((timeline) {
-        return Flexible(
+      children: <Widget>[
+        Flexible(
           child: InkWell(
             onTap: () {
               setState(() {
-                selectedTimeline = timeline;
+                selectedTimeline = timelines[0];
               });
             },
             child: Text(
-              timeline,
+              timelines[0],
               style: TextStyle(
-                fontSize: timeline == selectedTimeline ? 20 : 14,
+                fontSize: timelines[0] == selectedTimeline ? 20 : 14,
                 color: Colors.grey,
               ),
             ),
           ),
-        );
-      }).toList(),
-    );
-
-    // TabBar personalizado
-    Widget tabBar = TabBar(
-      tabs: [
-        Tab(text: 'Tendencia'),
-        Tab(text: 'Deportes'),
-        Tab(text: 'Audífonos'),
-        Tab(text: 'Inalámbricos'),
-        Tab(text: 'Bluetooth'),
+        ),
+        Flexible(
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                selectedTimeline = timelines[1];
+              });
+            },
+            child: Text(
+              timelines[1],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: timelines[1] == selectedTimeline ? 20 : 14,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+        Flexible(
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                selectedTimeline = timelines[2];
+              });
+            },
+            child: Text(
+              timelines[2],
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: timelines[2] == selectedTimeline ? 20 : 14,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
       ],
-      labelStyle: TextStyle(fontSize: 16.0),
-      unselectedLabelStyle: TextStyle(fontSize: 14.0),
-      labelColor: Colors.grey,
-      unselectedLabelColor: Color.fromRGBO(0, 0, 0, 0.5),
-      isScrollable: true,
-      controller: tabController,
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: !isSearching
-            ? Text('Tu Tienda')
-            : TextField(
-          controller: searchController,
-          style: TextStyle(color: Colors.black),
-          decoration: InputDecoration(
-            hintText: 'Buscar...',
-            hintStyle: TextStyle(color: Colors.black),
-            border: InputBorder.none,
-          ),
-          onChanged: _filterSearchResults,
-        ),
+        title: Text('yourstore'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.notifications),
@@ -156,11 +127,15 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           ),
           IconButton(
             icon: SvgPicture.asset(
-              'assets/icons/search_icon.svg',
+              'assets/icons/chatbot_icon.svg', // Cambia a tu ícono de chatbot.
               height: 24,
               width: 24,
             ),
-            onPressed: _toggleSearch,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => ChatPage()), // Página del chatbot.
+              );
+            },
           ),
         ],
       ),
@@ -193,16 +168,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
+                    SliverToBoxAdapter(child: BrandSlider()),
                     SliverToBoxAdapter(child: topHeader),
-                    SliverToBoxAdapter(
-                      child: Column(
-                        children: [
-                          _buildProductList(),
-                          SizedBox(height: 16),
-                          tabBar,
-                        ],
-                      ),
-                    ),
+                    SliverToBoxAdapter(child: _buildProductList()),
                   ];
                 },
                 body: TabView(tabController: tabController),

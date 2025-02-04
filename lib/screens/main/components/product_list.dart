@@ -12,8 +12,10 @@ class ProductList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double cardHeight = MediaQuery.of(context).size.height / 2.0;
-    double cardWidth = MediaQuery.of(context).size.width / 2.5;
+    // Ajuste de dimensiones más estándar
+    double cardHeight = MediaQuery.of(context).size.height * 0.3; // 30% del alto de la pantalla
+    double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% del ancho de la pantalla
+    double paginationSize = 8.0; // Tamaño más pequeño para los puntos de paginación
 
     return SizedBox(
       height: cardHeight,
@@ -26,35 +28,16 @@ class ProductList extends StatelessWidget {
             product: products[index],
           );
         },
-        scale: 0.8,
+        scale: 0.9, // Proporción ligeramente ajustada
         controller: SwiperController(),
-        viewportFraction: 0.5,
+        viewportFraction: 0.6, // Ajuste más pequeño para que se vean más productos en pantalla
         loop: false,
         fade: 0.5,
         pagination: SwiperCustomPagination(
           builder: (context, config) {
-            if (config.itemCount > 20) {
-              print(
-                  "The itemCount is too big, we suggest using FractionPaginationBuilder instead of DotSwiperPaginationBuilder in this situation");
-            }
-
             Color activeColor = mediumYellow;
             Color color = Colors.grey.withOpacity(.3);
-            double size = 10.0;
-            double space = 5.0;
-
-            if (config.indicatorLayout != PageIndicatorLayout.NONE &&
-                config.layout == SwiperLayout.DEFAULT) {
-              return PageIndicator(
-                count: config.itemCount,
-                controller: config.pageController!,
-                layout: config.indicatorLayout,
-                size: size,
-                activeColor: activeColor,
-                color: color,
-                space: space,
-              );
-            }
+            double space = 4.0; // Espaciado más compacto
 
             List<Widget> dots = [];
             int itemCount = config.itemCount;
@@ -71,20 +54,20 @@ class ProductList extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: active ? activeColor : color,
                     ),
-                    width: size,
-                    height: size,
+                    width: paginationSize,
+                    height: paginationSize,
                   ),
                 ),
               ));
             }
 
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(8.0), // Margen reducido
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: dots.map((dot) => Expanded(child: dot)).toList(),
+                  children: dots.map((dot) => dot).toList(),
                 ),
               ),
             );
