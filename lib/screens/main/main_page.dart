@@ -16,6 +16,8 @@ import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
 import 'components/chat_page.dart';
+import 'components/brand_slider.dart';
+
 
 List<String> timelines = [
   'Destacado Semana',
@@ -166,6 +168,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
+SliverToBoxAdapter(child: BrandSlider()),
                     SliverToBoxAdapter(child: topHeader),
                     SliverToBoxAdapter(child: _buildProductList()),
                   ];
