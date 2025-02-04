@@ -6,13 +6,24 @@ class BrandSlider extends StatefulWidget {
   _BrandSliderState createState() => _BrandSliderState();
 }
 
-class _BrandSliderState extends State<BrandSlider> with SingleTickerProviderStateMixin {
+class _BrandSliderState extends State<BrandSlider> {
+  final List<Map<String, dynamic>> brands = [
+    {'name': 'Samsung', 'color': Colors.blue},
+    {'name': 'Apple', 'color': Colors.black},
+    {'name': 'Xiaomi', 'color': Colors.orange},
+    {'name': 'Oppo', 'color': Colors.green},
+    {'name': 'Vivo', 'color': Colors.purple},
+    {'name': 'Realme', 'color': Colors.yellow},
+    {'name': 'OnePlus', 'color': Colors.red},
+    {'name': 'Motorola', 'color': Colors.teal},
+    {'name': 'Nokia', 'color': Colors.blueAccent},
+    {'name': 'Huawei', 'color': Colors.deepOrange},
+    {'name': 'Sony', 'color': Colors.pink},
+    {'name': 'LG', 'color': Colors.brown},
+  ];
+
   late ScrollController _scrollController;
   late Timer _timer;
-
-  final List<String> _brands = [
-    'Samsung', 'Apple', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Motorola', 'Nokia', 'Huawei', 'Sony', 'LG'
-  ];
 
   @override
   void initState() {
@@ -22,16 +33,21 @@ class _BrandSliderState extends State<BrandSlider> with SingleTickerProviderStat
   }
 
   void _startAutoScroll() {
-    const scrollDuration = Duration(seconds: 10);
-    _timer = Timer.periodic(scrollDuration, (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: scrollDuration,
-          curve: Curves.linear,
-        ).then((_) {
-          _scrollController.jumpTo(0); // Reiniciar el scroll cuando llegue al final
-        });
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.offset;
+        final nextScroll = currentScroll + 1.5; // Velocidad del desplazamiento
+
+        if (nextScroll >= maxScroll) {
+          _scrollController.jumpTo(0); // Reinicia al inicio
+        } else {
+          _scrollController.animateTo(
+            nextScroll,
+            duration: const Duration(milliseconds: 30),
+            curve: Curves.linear,
+          );
+        }
       }
     });
   }
@@ -45,25 +61,24 @@ class _BrandSliderState extends State<BrandSlider> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      padding: EdgeInsets.symmetric(vertical: 8),
+    return SizedBox(
+      height: 60, // Altura del slider
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        itemCount: _brands.length,
+        itemCount: brands.length * 10, // Se repiten para efecto infinito
         itemBuilder: (context, index) {
+          final brand = brands[index % brands.length];
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Chip(
               label: Text(
-                _brands[index],
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                brand['name'],
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              backgroundColor: Colors.white,
+              backgroundColor: brand['color'],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: Colors.grey.shade300),
               ),
             ),
           );
