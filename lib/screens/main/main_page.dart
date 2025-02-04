@@ -16,14 +16,12 @@ import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
 
-
-
 List<String> timelines = [
   'Destacado Semana',
-  'lo ultimo del mes',
+  'Lo último del Mes',
   'Mejor de 2025',
 ];
-String selectedTimeline = 'Presentado Semanalmente';
+String selectedTimeline = 'Destacado Semana';
 
 class MainPage extends StatefulWidget {
   @override
@@ -57,11 +55,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void _filterSearchResults(String query) {
     List<Product> tempList = [];
     if (query.isNotEmpty) {
-      products.forEach((product) {
+      for (var product in products) {
         if (product.name.toLowerCase().contains(query.toLowerCase())) {
           tempList.add(product);
         }
-      });
+      }
     } else {
       tempList.addAll(products);
     }
@@ -93,62 +91,30 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Header con opciones de línea de tiempo
     Widget topHeader = Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Flexible(
+      children: timelines.map((timeline) {
+        return Flexible(
           child: InkWell(
             onTap: () {
               setState(() {
-                selectedTimeline = timelines[0];
+                selectedTimeline = timeline;
               });
             },
             child: Text(
-              timelines[0],
+              timeline,
               style: TextStyle(
-                fontSize: timelines[0] == selectedTimeline ? 20 : 14,
+                fontSize: timeline == selectedTimeline ? 20 : 14,
                 color: Colors.grey,
               ),
             ),
           ),
-        ),
-        Flexible(
-          child: InkWell(
-            onTap: () {
-              setState(() {
-                selectedTimeline = timelines[1];
-              });
-            },
-            child: Text(
-              timelines[1],
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: timelines[1] == selectedTimeline ? 20 : 14,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ),
-        Flexible(
-          child: InkWell(
-            onTap: () {
-              setState(() {
-                selectedTimeline = timelines[2];
-              });
-            },
-            child: Text(
-              timelines[2],
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: timelines[2] == selectedTimeline ? 20 : 14,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ),
-      ],
+        );
+      }).toList(),
     );
 
+    // TabBar personalizado
     Widget tabBar = TabBar(
       tabs: [
         Tab(text: 'Tendencia'),
@@ -203,16 +169,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         painter: MainBackground(),
         child: TabBarView(
           controller: bottomTabController,
-          physics: NeverScrollableScrollPhysics(), // Mantén esto si no quieres swipe en tabs.
+          physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
             SafeArea(
               child: NestedScrollView(
                 headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
-                      expandedHeight: 250, // Ajusta la altura del banner
+                      expandedHeight: 250,
                       pinned: true,
-                      primary: false, // Permite superposición con la barra de estado
+                      primary: false,
                       flexibleSpace: FlexibleSpaceBar(
                         background: BannerWidget(
                           imageUrl: 'https://i.imgur.com/GaEsmRG.png',
@@ -229,14 +195,12 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                     ),
                     SliverToBoxAdapter(child: topHeader),
                     SliverToBoxAdapter(
-                      child: SingleChildScrollView( // Envuelve en scroll si es necesario.
-                        child: Column(
-                          children: [
-                            _buildProductList(), // Lista de productos.
-                            SizedBox(height: 16), // Espacio entre elementos.
-                            tabBar, // TabBar adicional.
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          _buildProductList(),
+                          SizedBox(height: 16),
+                          tabBar,
+                        ],
                       ),
                     ),
                   ];
