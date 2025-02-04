@@ -115,7 +115,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tu Tienda'),
+        title: Text('yourstore'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.notifications),
