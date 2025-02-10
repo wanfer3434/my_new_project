@@ -18,11 +18,11 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   List<Product> products = [
     Product(id: 'roackerz 400',imageUrls: ['assets/headphones.png'],
-        name: 'Boat roackerz 400 On-Ear Bluetooth Headphones', description: 'description', price: 45.3),
+        name: 'Boat roackerz 400 On-Ear Bluetooth Headphones', description: 'description', price: 45.3,category: 'Wireless',),
     Product(id: 'roackerz 100',imageUrls: ['assets/headphones_2.png'],
-        name: 'Boat roackerz 100 On-Ear Bluetooth Headphones', description: 'description', price: 22.3),
+        name: 'Boat roackerz 100 On-Ear Bluetooth Headphones', description: 'description', price: 22.3,category: 'Wireless'),
     Product(id: 'roackerz 300',imageUrls: ['assets/headphones_3.png'],
-        name: 'Boat roackerz 300 On-Ear Bluetooth Headphones', description: 'description', price: 58.3)
+        name: 'Boat roackerz 300 On-Ear Bluetooth Headphones', description: 'description', price: 58.3,category: 'Wireless')
   ];
 
   @override

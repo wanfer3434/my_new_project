@@ -83,22 +83,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget tabBar = TabBar(
-      tabs: [
-        Tab(text: 'Trending'),
-        Tab(text: 'Sports'),
-        Tab(text: 'Headsets'),
-        Tab(text: 'Wireless'),
-        Tab(text: 'Bluetooth'),
-      ],
-      labelStyle: TextStyle(fontSize: 16.0),
-      unselectedLabelStyle: TextStyle(fontSize: 14.0),
-      labelColor: darkGrey,
-      unselectedLabelColor: Color.fromRGBO(0, 0, 0, 0.5),
-      isScrollable: true,
-      controller: tabController,
-    );
-
     return ChangeNotifierProvider(
       create: (_) => CategoryProvider(),
       child: Scaffold(
@@ -137,26 +121,39 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 child: NestedScrollView(
                   headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                     return <Widget>[
-                      SliverAppBar(
-                        pinned: true,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: BannerWidget(
-                            imageUrl: 'https://i.imgur.com/GaEsmRG.png',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AnotherPage(),
-                                ),
-                              );
-                            },
-                          ),
+                      SliverToBoxAdapter(
+                        child: BannerWidget(
+                          imageUrl: 'https://i.imgur.com/GaEsmRG.png',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AnotherPage(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       SliverToBoxAdapter(child: BrandSlider()),
                       SliverToBoxAdapter(child: _buildTimelineSelector()),
                       SliverToBoxAdapter(child: _buildProductList()),
-                      SliverToBoxAdapter(child: tabBar),
+                      SliverToBoxAdapter(
+                        child: TabBar(
+                          controller: tabController,
+                          tabs: [
+                            Tab(text: 'Trending'),
+                            Tab(text: 'Sports'),
+                            Tab(text: 'Headsets'),
+                            Tab(text: 'Wireless'),
+                            Tab(text: 'Promoción'),
+                          ],
+                          labelStyle: TextStyle(fontSize: 16.0),
+                          unselectedLabelStyle: TextStyle(fontSize: 14.0),
+                          labelColor: darkGrey,
+                          unselectedLabelColor: Color.fromRGBO(0, 0, 0, 0.5),
+                          isScrollable: true,
+                        ),
+                      ),
                     ];
                   },
                   body: TabView(tabController: tabController),

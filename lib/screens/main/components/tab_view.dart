@@ -43,13 +43,13 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
       controller: widget.tabController,
       physics: BouncingScrollPhysics(),
       children: [
-        // Pestaña 1: Categorías + Lista recomendada
+        // Trending
         SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                //height: 150,
+                height: 150,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
@@ -74,12 +74,22 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
                 ),
               ),
               SizedBox(height: 6),
-              RecommendedList(),
+              RecommendedList(category: 'Trending'), // Se pasa la categoría Trending
             ],
           ),
         ),
-        // Pestaña 2: Lista recomendada (puedes personalizarla)
-        RecommendedList(),
+
+        // Sports
+        RecommendedList(category: 'Sports'),
+
+        // Headsets
+        RecommendedList(category: 'Headsets'),
+
+        // Wireless
+        RecommendedList(category: 'Wireless'),
+
+        // Bluetooth
+        RecommendedList(category: 'Bluetooth'),
       ],
     );
   }

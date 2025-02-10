@@ -5,41 +5,43 @@ class LocalProductService {
   // Lista local de productos
   final List<Product> products = [
     Product(
-      id: 'iphome_001',
+      id: 'iphone_001',
       imageUrls: [
         'https://i.imgur.com/pKWSR08.jpg',
         'https://i.imgur.com/Ort5tWN.jpg',
         'https://i.imgur.com/IXfsIJJ.jpg',
-        'https://i.imgur.com/zJIjhZu.jpg'
-
+        'https://i.imgur.com/zJIjhZu.jpg',
       ],
-      name: 'Iphone',
-      description: 'lentes,Case',
+      name: 'iPhone',
+      description: 'Modelos con lentes y case incluidos.',
       price: 25000,
+      category: 'Smartphones',
     ),
     Product(
-      id: 'Samsung001',
+      id: 'samsung_a22',
       imageUrls: [
         'https://i.imgur.com/Zap1XCB.jpg',
-        'https://i.imgur.com/xlucFE2.jpg'
+        'https://i.imgur.com/xlucFE2.jpg',
       ],
       name: 'Samsung A22',
-      description: 'A22 4G, A22 5G',
+      description: 'Disponible en versión 4G y 5G.',
       price: 30000,
+      category: 'Smartphones',
     ),
     Product(
-      id: 'Redmi',
+      id: 'redmi_14c',
       imageUrls: [
         'https://i.imgur.com/GEWI08P.jpg',
         'https://i.imgur.com/650xpzR.jpg',
-        'https://i.imgur.com/4mejGU4.jpg'
+        'https://i.imgur.com/4mejGU4.jpg',
       ],
-      name: 'Redmin 14c',
-      description: '14c, 12',
+      name: 'Redmi 14C',
+      description: 'También disponible en modelo 12.',
       price: 25000,
+      category: 'Smartphones',
     ),
     Product(
-      id: 'samsung_Camara',
+      id: 'samsung_camera',
       imageUrls: [
         'https://i.imgur.com/Ghrw0g5.jpg',
         'https://i.imgur.com/Mk5phUn.jpg',
@@ -49,16 +51,22 @@ class LocalProductService {
         'https://i.imgur.com/IkyYPoB.jpg',
         'https://i.imgur.com/MtMle6w.jpg',
         'https://i.imgur.com/BngXOfK.jpg',
-        'https://i.imgur.com/EKmFTAk.jpg'
+        'https://i.imgur.com/EKmFTAk.jpg',
       ],
-      name: 'Cámara Digital',
-      description: 'Samsung Cámara Digital',
+      name: 'Cámara Digital Samsung',
+      description: 'Cámara digital de alta resolución con múltiples accesorios.',
       price: 300000,
+      category: 'Cámaras',
     ),
   ];
 
-  // Método para obtener la lista de productos
+  // Método para obtener todos los productos
   List<Product> getProducts() {
     return products;
+  }
+
+  // Método para obtener productos por categoría
+  List<Product> getProductsByCategory(String category) {
+    return products.where((product) => product.category == category).toList();
   }
 }

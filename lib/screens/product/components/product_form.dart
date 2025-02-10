@@ -47,7 +47,7 @@ class _ProductFormState extends State<ProductForm> {
       averageRating: double.tryParse(_averageRatingController.text) ?? 0, // Agrega la calificación promedio
       ratingCount: int.tryParse(_ratingCountController.text) ?? 0, // Agrega el conteo de calificaciones
     );
-
+/*
     if (widget.documentId == null) {
       await _firestoreService.addProduct(product); // Llama al servicio para agregar el producto
     } else {
@@ -56,7 +56,7 @@ class _ProductFormState extends State<ProductForm> {
 
     Navigator.of(context).pop();
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(

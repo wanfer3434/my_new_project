@@ -136,7 +136,7 @@ class _ViewProductPageState extends State<ViewProductPage> {
                     ),
                   ]),
                 ),
-                MoreProducts()
+                MoreProducts(category: '',)
               ],
             ),
           ),

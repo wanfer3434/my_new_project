@@ -12,40 +12,34 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
-  String selectedPeriod = "";
-  String selectedCategory = "";
-  String selectedPrice = "";
+  String selectedCategory = ""; // Categoría seleccionada
 
-  List<Product> products = [
+  final List<Product> products = [
     Product(
-        id: 'L325',  // Agregar un ID único
-        imageUrls:['assets/headphones_2.png'],
+        id: 'L325',
+        imageUrls: ['assets/headphones_2.png'],
         name: 'Skullcandy headset L325',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor ut labore et dolore magna aliqua. Nec nam aliquam sem et tortor consequat id porta nibh. Orci porta non pulvinar neque laoreet suspendisse. Id nibh tortor id aliquet. Dui sapien eget mi proin. Viverra vitae congue eu consequat ac felis donec. Etiam dignissim diam quis enim lobortis scelerisque fermentum dui faucibus. Vulputate mi sit amet mauris commodo quis imperdiet. Vel fringilla est ullamcorper eget nulla facilisi etiam dignissim. Sit amet cursus sit amet dictum sit amet justo. Mattis pellentesque id nibh tortor. Sed blandit libero volutpat sed cras ornare arcu dui. Fermentum et sollicitudin ac orci phasellus. Ipsum nunc aliquet bibendum enim facilisis gravida. Viverra suspendisse potenti nullam ac tortor. Dapibus ultrices in iaculis nunc sed. Nisi porta lorem mollis aliquam ut porttitor leo a. Phasellus egestas tellus rutrum tellus pellentesque. Et malesuada fames ac turpis egestas maecenas pharetra convallis. Commodo ullamcorper a lacus vestibulum sed arcu non odio. Urna id volutpat lacus laoreet non curabitur gravida arcu ac. Eros in cursus turpis massa. Eget mauris pharetra et ultrices neque.',
-        price:102.99),
+        description: 'High-quality headset with immersive sound.',
+        price: 102.99,
+        category: 'Skull Candy'),
     Product(
-        id: 'X25',  // Agregar un ID único
+        id: 'X25',
         imageUrls: ['assets/headphones_3.png'],
         name: 'Skullcandy headset X25',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor ut labore et dolore magna aliqua. Nec nam aliquam sem et tortor consequat id porta nibh. Orci porta non pulvinar neque laoreet suspendisse. Id nibh tortor id aliquet. Dui sapien eget mi proin. Viverra vitae congue eu consequat ac felis donec. Etiam dignissim diam quis enim lobortis scelerisque fermentum dui faucibus. Vulputate mi sit amet mauris commodo quis imperdiet. Vel fringilla est ullamcorper eget nulla facilisi etiam dignissim. Sit amet cursus sit amet dictum sit amet justo. Mattis pellentesque id nibh tortor. Sed blandit libero volutpat sed cras ornare arcu dui. Fermentum et sollicitudin ac orci phasellus. Ipsum nunc aliquet bibendum enim facilisis gravida. Viverra suspendisse potenti nullam ac tortor. Dapibus ultrices in iaculis nunc sed. Nisi porta lorem mollis aliquam ut porttitor leo a. Phasellus egestas tellus rutrum tellus pellentesque. Et malesuada fames ac turpis egestas maecenas pharetra convallis. Commodo ullamcorper a lacus vestibulum sed arcu non odio. Urna id volutpat lacus laoreet non curabitur gravida arcu ac. Eros in cursus turpis massa. Eget mauris pharetra et ultrices neque.',
-        price: 55.99),
+        description: 'Noise-canceling headset for superior audio.',
+        price: 55.99,
+        category: 'Skull Candy'),
     Product(
-        id: 'M003',  // Agregar un ID único
+        id: 'M003',
         imageUrls: ['assets/headphones.png'],
-        name: 'Blackzy PRO hedphones M003',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor ut labore et dolore magna aliqua. Nec nam aliquam sem et tortor consequat id porta nibh. Orci porta non pulvinar neque laoreet suspendisse. Id nibh tortor id aliquet. Dui sapien eget mi proin. Viverra vitae congue eu consequat ac felis donec. Etiam dignissim diam quis enim lobortis scelerisque fermentum dui faucibus. Vulputate mi sit amet mauris commodo quis imperdiet. Vel fringilla est ullamcorper eget nulla facilisi etiam dignissim. Sit amet cursus sit amet dictum sit amet justo. Mattis pellentesque id nibh tortor. Sed blandit libero volutpat sed cras ornare arcu dui. Fermentum et sollicitudin ac orci phasellus. Ipsum nunc aliquet bibendum enim facilisis gravida. Viverra suspendisse potenti nullam ac tortor. Dapibus ultrices in iaculis nunc sed. Nisi porta lorem mollis aliquam ut porttitor leo a. Phasellus egestas tellus rutrum tellus pellentesque. Et malesuada fames ac turpis egestas maecenas pharetra convallis. Commodo ullamcorper a lacus vestibulum sed arcu non odio. Urna id volutpat lacus laoreet non curabitur gravida arcu ac. Eros in cursus turpis massa. Eget mauris pharetra et ultrices neque.',
-        price:152.99),
+        name: 'Blackzy PRO headphones M003',
+        description: 'Professional-grade headphones for audiophiles.',
+        price: 152.99,
+        category: 'JBL'),
   ];
 
-  List<String> timeFilter = [
-    'Brand',
-    'New',
-    'Latest',
-    'Trending',
-    'Discount',
-  ];
-
-  List<String> categoryFilter = [
+  final List<String> categoryFilter = [
+    'All', // Para mostrar todos los productos
     'Skull Candy',
     'Boat',
     'JBL',
@@ -53,296 +47,119 @@ class _SearchPageState extends State<SearchPage>
     'Seg',
   ];
 
-  List<String> priceFilter = [
-    '\$50-200',
-    '\$200-400',
-    '\$400-800',
-    '\$800-1000',
-  ];
-
   List<Product> searchResults = [];
-
   TextEditingController searchController = TextEditingController();
-
   late RubberAnimationController _controller;
 
   @override
   void initState() {
-    _controller = RubberAnimationController(
-        vsync: this,
-        halfBoundValue: AnimationControllerValue(percentage: 0.4),
-        upperBoundValue: AnimationControllerValue(percentage: 0.4),
-        lowerBoundValue: AnimationControllerValue(pixel: 50),
-        duration: Duration(milliseconds: 200));
     super.initState();
+    _controller = RubberAnimationController(
+      vsync: this,
+      halfBoundValue: AnimationControllerValue(percentage: 0.4),
+      upperBoundValue: AnimationControllerValue(percentage: 0.4),
+      lowerBoundValue: AnimationControllerValue(pixel: 50),
+      duration: Duration(milliseconds: 200),
+    );
+    searchResults = products; // Inicializa con todos los productos
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _filterProducts(String query) {
+    setState(() {
+      searchResults = products.where((product) {
+        final matchesName =
+        product.name.toLowerCase().contains(query.toLowerCase());
+        final matchesCategory =
+            selectedCategory == "All" || product.category == selectedCategory;
+        return matchesName && matchesCategory;
+      }).toList();
+    });
   }
 
-  void _expand() {
-    _controller.expand();
-  }
-
-  Widget _getLowerLayer() {
+  Widget _buildSearchField() {
     return Container(
-      margin: const EdgeInsets.only(top: kToolbarHeight),
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Search',
-                  style: TextStyle(
-                    color: darkGrey,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                CloseButton()
-              ],
-            ),
+      margin: EdgeInsets.symmetric(horizontal: 16.0),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.orange, width: 1)),
+      ),
+      child: TextField(
+        controller: searchController,
+        onChanged: _filterProducts,
+        cursorColor: darkGrey,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.zero,
+          border: InputBorder.none,
+          prefixIcon: SvgPicture.asset(
+            'assets/icons/search_icon.svg',
+            fit: BoxFit.scaleDown,
           ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 16.0),
-            decoration: BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(color: Colors.orange, width: 1))),
-            child: TextField(
-              controller: searchController,
-              onChanged: (value) {
-                if (value.isNotEmpty) {
-                  List<Product> tempList = [];
-                  products.forEach((product) {
-                    if (product.name.toLowerCase().contains(value)) {
-                      tempList.add(product);
-                    }
-                  });
-                  setState(() {
-                    searchResults.clear();
-                    searchResults.addAll(tempList);
-                  });
-                  return;
-                } else {
-                  setState(() {
-                    searchResults.clear();
-                    searchResults.addAll(products);
-                  });
-                }
-              },
-              cursorColor: darkGrey,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.zero,
-                border: InputBorder.none,
-                prefixIcon: SvgPicture.asset(
-                  'assets/icons/search_icon.svg',
-                  fit: BoxFit.scaleDown,
-                ),
-                suffix: TextButton(
-                  onPressed: () {
-                    searchController.clear();
-                    searchResults.clear();
-                  },
-                  child: Text(
-                    'Clear',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-              ),
-            ),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear, color: Colors.red),
+            onPressed: () {
+              searchController.clear();
+              _filterProducts('');
+            },
           ),
-          Flexible(
-            child: Container(
-              color: Colors.orange[50],
-              child: ListView.builder(
-                  itemCount: searchResults.length,
-                  itemBuilder: (_, index) => Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: ListTile(
-                        onTap: () =>
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (_) => ViewProductPage(
-                                      product: searchResults[index],
-                                    ))),
-                        title: Text(searchResults[index].name),
-                      ))),
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
 
-  Widget _getUpperLayer() {
-    return Container(
-      decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
-                offset: Offset(0, -3),
-                blurRadius: 10)
-          ],
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(24), topLeft: Radius.circular(24)),
-          color: Colors.white),
-      child: ListView(
-        physics: NeverScrollableScrollPhysics(),
-//          controller: _scrollController,
-        children: <Widget>[
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Filters',
-                style: TextStyle(color: Colors.grey[300]),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(left: 32.0, top: 16.0, bottom: 16.0),
-              child: Text(
-                'Sort By',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          Container(
-            height: 50,
-            child: ListView.builder(
-              itemBuilder: (_, index) => Center(
-                  child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                ),
-                child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedPeriod = timeFilter[index];
-                      });
-                    },
-                    child: Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 20.0),
-                        decoration: selectedPeriod == timeFilter[index]
-                            ? BoxDecoration(
-                                color: Color(0xffFDB846),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(45)))
-                            : BoxDecoration(),
-                        child: Text(
-                          timeFilter[index],
-                          style: TextStyle(fontSize: 16.0),
-                        ))),
-              )),
-              itemCount: timeFilter.length,
-              scrollDirection: Axis.horizontal,
-            ),
-          ),
-          Container(
-            height: 50,
-            child: ListView.builder(
-              itemBuilder: (_, index) => Center(
-                  child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                ),
-                child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedCategory = categoryFilter[index];
-                      });
-                    },
-                    child: Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 20.0),
-                        decoration: selectedCategory == categoryFilter[index]
-                            ? BoxDecoration(
-                                color: Color(0xffFDB846),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(45)))
-                            : BoxDecoration(),
-                        child: Text(
-                          categoryFilter[index],
-                          style: TextStyle(fontSize: 16.0),
-                        ))),
-              )),
-              itemCount: categoryFilter.length,
-              scrollDirection: Axis.horizontal,
-            ),
-          ),
-          Container(
-            height: 50,
-            child: ListView.builder(
-              itemBuilder: (_, index) => Center(
-                  child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                ),
-                child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedPrice = priceFilter[index];
-                      });
-                    },
-                    child: Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 20.0),
-                        decoration: selectedPrice == priceFilter[index]
-                            ? BoxDecoration(
-                                color: Color(0xffFDB846),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(45)))
-                            : BoxDecoration(),
-                        child: Text(
-                          priceFilter[index],
-                          style: TextStyle(fontSize: 16.0),
-                        ))),
-              )),
-              itemCount: priceFilter.length,
-              scrollDirection: Axis.horizontal,
-            ),
-          )
-        ],
+  Widget _buildCategoryDropdown() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: DropdownButton<String>(
+        value: selectedCategory.isEmpty ? "All" : selectedCategory,
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              selectedCategory = newValue;
+              _filterProducts(searchController.text);
+            });
+          }
+        },
+        items: categoryFilter.map((String category) {
+          return DropdownMenuItem<String>(
+            value: category,
+            child: Text(category),
+          );
+        }).toList(),
       ),
+    );
+  }
+
+  Widget _buildProductList() {
+    return Expanded(
+      child: searchResults.isNotEmpty
+          ? ListView.builder(
+        itemCount: searchResults.length,
+        itemBuilder: (_, index) => ListTile(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ViewProductPage(product: searchResults[index]),
+            ),
+          ),
+          title: Text(searchResults[index].name),
+          subtitle: Text(searchResults[index].category), // Mostrar categoría
+        ),
+      )
+          : Center(child: Text("No products found")),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: SafeArea(
-        top: true,
-        bottom: false,
-        child: Scaffold(
-//          bottomSheet: ClipRRect(
-//            borderRadius: BorderRadius.only(
-//                topRight: Radius.circular(25), topLeft: Radius.circular(25)),
-//            child: BottomSheet(
-//                onClosing: () {},
-//                builder: (_) => Container(
-//                      padding: EdgeInsets.all(16.0),
-//                      child: Row(
-//                          mainAxisAlignment: MainAxisAlignment.center,
-//                          children: <Widget>[Text('Filters')]),
-//                      color: Colors.white,
-//                      width: MediaQuery.of(context).size.height,
-//                    )),
-//          ),
-            body: RubberBottomSheet(
-          lowerLayer: _getLowerLayer(), // The underlying page (Widget)
-          upperLayer: _getUpperLayer(), // The bottomsheet content (Widget)
-          animationController: _controller, // The one we created earlier
-        )),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Search'),
+        actions: [CloseButton()],
+      ),
+      body: Column(
+        children: [
+          _buildSearchField(),
+          _buildCategoryDropdown(),
+          _buildProductList(),
+        ],
       ),
     );
   }
