@@ -23,7 +23,7 @@ class _RecommendedListState extends State<RecommendedList> {
       name: 'Forro con cadena',
       description: 'Diseño para Dama',
       price: 30000,
-      category: 'Trending',
+      category: 'Plantas & Diagnóstico',
     ),
     Product(
       id: '2',
@@ -31,7 +31,7 @@ class _RecommendedListState extends State<RecommendedList> {
       name: 'Vidrios para Pantalla',
       description: 'A70',
       price: 1000,
-      category: 'Sports',
+      category: 'Celulares',
     ),
     Product(
       id: '3',
@@ -39,23 +39,27 @@ class _RecommendedListState extends State<RecommendedList> {
       name: 'Botones',
       description: 'Astronautas',
       price: 2000,
-      category: 'Headsets',
+      category: 'Audífonos',
     ),
     Product(
       id: '4',
-      imageUrls: ['https://imgur.com/nRnC2Pr', 'https://imgur.com/LApJ975', 'https://imgur.com/8uWbc0e', 'https://imgur.com/Nxw35JW', 'https://imgur.com/01wfOd9', 'https://imgur.com/AHzgrev'],
+      imageUrls: [
+        'https://imgur.com/nRnC2Pr', 'https://imgur.com/LApJ975',
+        'https://imgur.com/8uWbc0e', 'https://imgur.com/Nxw35JW',
+        'https://imgur.com/01wfOd9', 'https://imgur.com/AHzgrev'
+      ],
       name: 'Cámaras Videograbables',
       description: 'Digital Camera',
       price: 30000,
-      category: 'Trending',
+      category: 'Camaras',
     ),
     Product(
       id: '5',
-      imageUrls: ['https://imgur.com/jClQVaf', 'https://imgur.com/zRyg7KF', 'https://imgur.com/Xh2nUmP'],
-      name: 'Cámaras',
+      imageUrls: ['https://i.imgur.com/zgyf3ow.jpg', 'https://i.imgur.com/sOcdUi7.jpg'],
+      name: 'Vidrios para Pantallas curvos',
       description: 'Digital Camera',
       price: 30000,
-      category: 'Trending',
+      category: 'Celulares',
     ),
   ];
 
@@ -102,6 +106,7 @@ class _RecommendedListState extends State<RecommendedList> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
               height: 40,
@@ -123,15 +128,17 @@ class _RecommendedListState extends State<RecommendedList> {
                 ],
               ),
             ),
-            Expanded(
-              child: filteredProducts.isEmpty
-                  ? Center(
-                child: Text(
-                  'No hay productos en esta categoría',
-                  style: TextStyle(fontSize: 18, color: Colors.black54),
-                ),
-              )
-                  : Padding(
+            SizedBox(height: 10),
+            filteredProducts.isEmpty
+                ? Center(
+              child: Text(
+                'No hay productos en esta categoría',
+                style: TextStyle(fontSize: 18, color: Colors.black54),
+              ),
+            )
+                : SizedBox(
+              height: constraints.maxHeight - 50, // Ajusta la altura para evitar errores
+              child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: MasonryGridView.count(
                   physics: BouncingScrollPhysics(),
@@ -194,7 +201,8 @@ class _RecommendedListState extends State<RecommendedList> {
                                   onRatingUpdate: (rating) {
                                     setState(() {
                                       _currentRatings[product.id] = rating;
-                                      _ratingCounts[product.id] = (_ratingCounts[product.id]! + 1);
+                                      _ratingCounts[product.id] =
+                                      (_ratingCounts[product.id]! + 1);
                                     });
                                   },
                                 ),

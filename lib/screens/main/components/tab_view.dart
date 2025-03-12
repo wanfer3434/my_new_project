@@ -16,6 +16,14 @@ class TabView extends StatefulWidget {
 class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   late AnimationController animationController;
 
+  final List<String> categoryNames = [
+    'Plantas & Diagnóstico',
+    'Celulares',
+    'Tendencia de Protectores',
+    'Audífonos',
+    'Camaras',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +31,12 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+
+    widget.tabController.addListener(() {
+      if (mounted) {
+        setState(() {}); // Actualizar la vista al cambiar pestaña
+      }
+    });
   }
 
   @override
@@ -35,62 +49,49 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final categories = Provider.of<CategoryProvider>(context).categories;
 
-    if (categories.isEmpty) {
-      return Center(child: Text('No categories available'));
-    }
-
-    return TabBarView(
-      controller: widget.tabController,
-      physics: BouncingScrollPhysics(),
-      children: [
-        // Trending
-        SingleChildScrollView(
-          child: Column(
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.75, // Definir altura fija
+      child: TabBarView(
+        controller: widget.tabController,
+        physics: BouncingScrollPhysics(),
+        children: categoryNames.map((category) {
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: CategoryCard(
-                        controller: animationController,
-                        begin: category.begin,
-                        end: category.end,
-                        categoryName: category.name ?? 'Unnamed Category',
-                        imageUrl: category.imageUrls.isNotEmpty
-                            ? category.imageUrls[0]
-                            : '',
-                        category: category,
-                        rating: category.averageRating ?? 0.0,
-                        whatsappUrl: category.whatsappUrl ?? '',
-                      ),
-                    );
-                  },
+              if (categories.isNotEmpty)
+                SizedBox(
+                  height: 150, // Definir altura de la lista horizontal
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final categoryData = categories[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: CategoryCard(
+                          controller: animationController,
+                          begin: categoryData.begin,
+                          end: categoryData.end,
+                          categoryName: categoryData.name ?? 'Sin Nombre',
+                          imageUrl: categoryData.imageUrls.isNotEmpty
+                              ? categoryData.imageUrls[0]
+                              : '',
+                          category: categoryData,
+                          rating: categoryData.averageRating ?? 0.0,
+                          whatsappUrl: categoryData.whatsappUrl ?? '',
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
               SizedBox(height: 6),
-              RecommendedList(category: 'Trending'), // Se pasa la categoría Trending
+              Expanded( // Solución al error de altura infinita
+                child: RecommendedList(category: category),
+              ),
             ],
-          ),
-        ),
-
-        // Sports
-        RecommendedList(category: 'Sports'),
-
-        // Headsets
-        RecommendedList(category: 'Headsets'),
-
-        // Wireless
-        RecommendedList(category: 'Wireless'),
-
-        // Bluetooth
-        RecommendedList(category: 'Bluetooth'),
-      ],
+          );
+        }).toList(),
+      ),
     );
   }
 }
