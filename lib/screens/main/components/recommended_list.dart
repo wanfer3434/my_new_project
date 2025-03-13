@@ -35,6 +35,14 @@ class _RecommendedListState extends State<RecommendedList> {
     ),
     Product(
       id: '3',
+      imageUrls: ['https://i.imgur.com/zgyf3ow.jpg', 'https://i.imgur.com/sOcdUi7.jpg','https://imgur.com/LApJ975'],
+      name: 'Vidrios para Pantallas curvos',
+      description: 'Digital Camera',
+      price: 30000,
+      category: 'Protectores Celular',
+    ),
+    Product(
+      id: '4',
       imageUrls: ['https://i.imgur.com/5zqRhBS.png'],
       name: 'Botones',
       description: 'Astronautas',
@@ -42,24 +50,14 @@ class _RecommendedListState extends State<RecommendedList> {
       category: 'Audífonos',
     ),
     Product(
-      id: '4',
+      id: '5',
       imageUrls: [
-        'https://imgur.com/nRnC2Pr', 'https://imgur.com/LApJ975',
-        'https://imgur.com/8uWbc0e', 'https://imgur.com/Nxw35JW',
-        'https://imgur.com/01wfOd9', 'https://imgur.com/AHzgrev'
+        'https://imgur.com/nRnC2Pr', 'https://imgur.com/8uWbc0e'
       ],
       name: 'Cámaras Videograbables',
       description: 'Digital Camera',
       price: 30000,
       category: 'Camaras',
-    ),
-    Product(
-      id: '5',
-      imageUrls: ['https://i.imgur.com/zgyf3ow.jpg', 'https://i.imgur.com/sOcdUi7.jpg'],
-      name: 'Vidrios para Pantallas curvos',
-      description: 'Digital Camera',
-      price: 30000,
-      category: 'Celulares',
     ),
   ];
 
@@ -100,8 +98,9 @@ class _RecommendedListState extends State<RecommendedList> {
 
   @override
   Widget build(BuildContext context) {
-    List<Product> filteredProducts =
-    allProducts.where((p) => p.category == widget.category).toList();
+    List<Product> filteredProducts = allProducts
+        .where((p) => p.category.toLowerCase().trim() == widget.category.toLowerCase().trim())
+        .toList();
 
     return LayoutBuilder(
       builder: (context, constraints) {

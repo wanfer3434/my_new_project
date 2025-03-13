@@ -19,7 +19,7 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   final List<String> categoryNames = [
     'Plantas & Diagnóstico',
     'Celulares',
-    'Tendencia de Protectores',
+    'Protectores Celular',
     'Audífonos',
     'Camaras',
   ];
@@ -60,7 +60,7 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
             children: [
               if (categories.isNotEmpty)
                 SizedBox(
-                  height: 150, // Definir altura de la lista horizontal
+                  height: 190, // Definir altura de la lista horizontal
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: categories.length,

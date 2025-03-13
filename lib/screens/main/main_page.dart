@@ -88,7 +88,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       tabs: [
         Tab(text: 'Plantas & Diagnóstico'),
         Tab(text: 'Celulares'),
-        Tab(text: 'Tendencia de Protectores'),
+        Tab(text: 'Protectores Celular'),
         Tab(text: 'Audifonos'),
         Tab(text: 'Camaras'),
       ],
