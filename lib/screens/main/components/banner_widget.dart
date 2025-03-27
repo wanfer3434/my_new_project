@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class BannerWidget extends StatelessWidget {
+import '../../notifications_page.dart';
+import 'chat_page.dart';
+
+class BannerPage extends StatelessWidget {
   final String imageUrl;
   final VoidCallback onTap;
 
-  const BannerWidget({
+  const BannerPage({
     Key? key,
     required this.imageUrl,
     required this.onTap,
@@ -13,56 +17,94 @@ class BannerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double width = constraints.maxWidth;
-        double height = width > 800
-            ? MediaQuery.of(context).size.height * 0.4 // 40% de altura en pantallas grandes
-            : MediaQuery.of(context).size.height * 0.25; // 25% en móviles
+    return Stack(
+      children: [
+        /// 📌 **FONDO CON DEGRADADO**
+        Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.3, // 40% de la pantalla
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.orange.shade900,
+                Colors.orange.shade600,
+                Colors.orange.shade300,
+              ],
+            ),
+          ),
+        ),
 
-        return GestureDetector(
+        /// 📌 **BANNER IMAGEN**
+        GestureDetector(
           onTap: onTap,
           child: Container(
-            width: double.infinity, // Ancho completo
-            height: height.clamp(200, 400), // Limita la altura entre 100 y 300
-            color: Colors.orange, // Fondo naranja
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.4,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(10), // Bordes redondeados
-              child: AspectRatio(
-                aspectRatio: 16 / 9, // Relación de aspecto (ancho/alto)
-                child: Image.network(
-                  imageUrl,
-                  fit: width > 800 ? BoxFit.cover : BoxFit.contain, // Ajuste según el tamaño
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            (loadingProgress.expectedTotalBytes ?? 1)
-                            : null,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) => Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                        SizedBox(height: 10),
-                        Text(
-                          'Error al cargar la imagen',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                          (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
                     ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                      SizedBox(height: 10),
+                      Text('Error al cargar la imagen', style: TextStyle(color: Colors.white)),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        );
-      },
+        ),
+
+        /// 📌 **BOTONES DE NOTIFICACIÓN Y CHAT**
+        Positioned(
+          top: 40, // Ajusta la altura según el diseño
+          right: 16,
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.notifications, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => NotificationsPage()),
+                  );
+                },
+              ),
+              SizedBox(width: 10),
+              IconButton(
+                icon: SvgPicture.asset(
+                  'assets/icons/chatbot_icon.svg',
+                  height: 24,
+                  width: 24,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => ChatPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

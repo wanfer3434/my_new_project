@@ -23,21 +23,14 @@ class CategoryCard extends StatelessWidget {
     required this.rating,
     required this.whatsappUrl,
     required Category category,
-    this.imageHeight = 100.0, // Valor por defecto para la altura de la imagen
+    this.imageHeight = 280.0, // Valor por defecto para la altura de la imagen
   });
 
   Widget _buildAnimation(BuildContext context, Widget? child) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Ajuste dinámico del ancho según el tamaño de la pantalla
-        double cardWidth;
-        if (constraints.maxWidth < 600) {
-          // Para dispositivos móviles
-          cardWidth = constraints.maxWidth * 0.60; // 60% del ancho
-        } else {
-          // Para dispositivos de escritorio
-          cardWidth = 300; // Ancho fijo para escritorio
-        }
+        double cardWidth = constraints.maxWidth > 400 ? 350 : constraints.maxWidth * 0.95;
+
 
         return Container(
           width: cardWidth,
@@ -47,7 +40,7 @@ class CategoryCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.all(Radius.circular(8)), // Redondeo mejorado
+            borderRadius: BorderRadius.all(Radius.circular(12)), // Redondeo mejorado
           ),
           child: Column(
             children: [
@@ -63,6 +56,7 @@ class CategoryCard extends StatelessWidget {
                   child: Center(child: Icon(Icons.error)),
                 ),
                 height: imageHeight, // Usar el nuevo parámetro de altura
+                width: double.infinity,
                 fit: BoxFit.cover, // Ajuste para que la imagen cubra el espacio
               ),
               Row(

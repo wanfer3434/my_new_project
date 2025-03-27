@@ -102,31 +102,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     return ChangeNotifierProvider(
       create: (_) => CategoryProvider(),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('YourStore'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.notifications),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => NotificationsPage()),
-                );
-              },
-            ),
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/icons/chatbot_icon.svg',
-                height: 24,
-                width: 24,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => ChatPage()),
-                );
-              },
-            ),
-          ],
-        ),
         bottomNavigationBar: CustomBottomBar(controller: bottomTabController),
         body: CustomPaint(
           painter: MainBackground(),
@@ -137,10 +112,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 child: NestedScrollView(
                   headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                     return <Widget>[
-                      SliverAppBar(
-                        pinned: true,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: BannerWidget(
+                      /// 📌 **BANNER SIN APPBAR**
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 200, // Ajusta este valor según necesites
+                          child: BannerPage(
                             imageUrl: 'https://i.imgur.com/GaEsmRG.png',
                             onTap: () {
                               Navigator.push(
@@ -153,6 +129,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
+
                       SliverToBoxAdapter(child: BrandSlider()),
                       SliverToBoxAdapter(child: _buildTimelineSelector()),
                       SliverToBoxAdapter(child: _buildProductList()),

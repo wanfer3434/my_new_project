@@ -35,7 +35,7 @@ class _RecommendedListState extends State<RecommendedList> {
     ),
     Product(
       id: '3',
-      imageUrls: ['https://i.imgur.com/zgyf3ow.jpg', 'https://i.imgur.com/sOcdUi7.jpg','https://imgur.com/LApJ975'],
+      imageUrls: ['https://i.imgur.com/zgyf3ow.jpg', 'https://i.imgur.com/sOcdUi7.jpg','https://imgur.com/LApJ975','https://i.imgur.com/QKEJ2Cz.jpg'],
       name: 'Vidrios para Pantallas curvos',
       description: 'Digital Camera',
       price: 30000,
@@ -43,7 +43,7 @@ class _RecommendedListState extends State<RecommendedList> {
     ),
     Product(
       id: '4',
-      imageUrls: ['https://i.imgur.com/5zqRhBS.png'],
+      imageUrls: ['https://i.imgur.com/5zqRhBS.png', 'https://i.imgur.com/pJ31feH.jpg','https://i.imgur.com/c5QE6kL.jpg','https://i.imgur.com/6MW5IPT.jpg'],
       name: 'Botones',
       description: 'Astronautas',
       price: 2000,
@@ -52,12 +52,42 @@ class _RecommendedListState extends State<RecommendedList> {
     Product(
       id: '5',
       imageUrls: [
-        'https://imgur.com/nRnC2Pr', 'https://imgur.com/8uWbc0e'
+        'https://i.imgur.com/GB1hy1B.jpg  ', 'https://i.imgur.com/MtMle6w.jpg'
       ],
-      name: 'Cámaras Videograbables',
+      name: 'Cámaras en bun estado',
       description: 'Digital Camera',
       price: 30000,
       category: 'Camaras',
+    ),
+    Product(
+      id: '6',
+      imageUrls: [
+        'https://i.imgur.com/EKmFTAk.jpg', 'https://i.imgur.com/U9KP4c5.jpg','https://i.imgur.com/7hjCxbU.jpg'
+      ],
+      name: 'Cámaras Digitales',
+      description: 'Digital Camera',
+      price: 30000,
+      category: 'Camaras',
+    ),
+    Product(
+      id: '7',
+      imageUrls: [
+        'https://i.imgur.com/IkyYPoB.jpg', 'https://i.imgur.com/xdA1ci9.jpg','https://i.imgur.com/lfpdl9G.jpg'
+      ],
+      name: 'Cámaras',
+      description: 'Digital Camera',
+      price: 30000,
+      category: 'Camaras',
+    ),
+    Product(
+      id: '8',
+      imageUrls: [
+        'https://i.imgur.com/2q28rLO.jpg', 'https://i.imgur.com/57cTnWG.jpg','https://i.imgur.com/zRyg7KF.jpg'
+      ],
+      name: 'Cámaras Digitales',
+      description: 'Digital Camera',
+      price: 30000,
+      category: 'Camaras de Pila Litio',
     ),
   ];
 
@@ -159,7 +189,7 @@ class _RecommendedListState extends State<RecommendedList> {
                             child: Image.network(
                               product.imageUrls[_currentImageIndices[index]],
                               fit: BoxFit.cover,
-                              height: 190,
+                              height: 150,
                               width: double.infinity,
                               errorBuilder: (context, error, stackTrace) =>
                                   Icon(Icons.error),

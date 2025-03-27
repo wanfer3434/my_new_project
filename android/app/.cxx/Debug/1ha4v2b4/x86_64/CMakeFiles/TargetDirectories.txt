@@ -1,0 +1,2 @@
+C:/Users/javie/Documents/my_new_project/android/app/.cxx/Debug/1ha4v2b4/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/javie/Documents/my_new_project/android/app/.cxx/Debug/1ha4v2b4/x86_64/CMakeFiles/rebuild_cache.dir

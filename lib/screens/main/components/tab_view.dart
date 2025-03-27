@@ -60,7 +60,7 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
             children: [
               if (categories.isNotEmpty)
                 SizedBox(
-                  height: 190, // Definir altura de la lista horizontal
+                  height: 359, // Definir altura de la lista horizontal
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: categories.length,
@@ -84,7 +84,7 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
                     },
                   ),
                 ),
-              SizedBox(height: 6),
+              SizedBox(height:8),
               Expanded( // Solución al error de altura infinita
                 child: RecommendedList(category: category),
               ),
