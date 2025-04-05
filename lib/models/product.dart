@@ -21,18 +21,19 @@ class Product {
     required this.category, // Asegurar que sea requerida o dar un valor por defecto
   });
 
-  factory Product.fromFirestore(Map<String, dynamic> data) {
+  factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: data['id'],
-      name: data['name'],
-      description: data['description'],
-      imageUrls: List<String>.from(data['imageUrls']),
-      price: (data['price'] as num).toDouble(),
-      averageRating: (data['averageRating'] as num?)?.toDouble(),
-      ratingCount: data['ratingCount'] as int?,
-      category: data['category'] ?? 'Uncategorized', // Asignamos un valor por defecto si falta
+      id: json['id'] ?? '',
+      name: json['name'] ?? 'Sin nombre',
+      description: json['description'] ?? 'Sin descripción',
+      imageUrls: List<String>.from(json['imageUrls'] ?? []),
+      price: (json['price'] ?? 0).toDouble(),
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
+      ratingCount: json['ratingCount'] as int?,
+      category: json['category'] ?? 'Uncategorized',
     );
   }
+
 
   Map<String, dynamic> toMap() {
     return {
