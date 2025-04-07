@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'service/rust_api_chat_service.dart'; // Asegúrate de tener esta clase
-import 'model/product_response.dart'; // Clase que representa un producto
+import 'product/product_response.dart'; // Clase que representa un producto
 
 class ChatScreen extends StatefulWidget {
   @override

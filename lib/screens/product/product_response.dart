@@ -3,49 +3,46 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ProductResponse {
+  final String id;
   final String nombre;
-  final double precio;
+  final String tipo;
   final String color;
+  final double precio;
+  final String fechaAgregado;
   final String? imagenUrl;
 
   ProductResponse({
+    required this.id,
     required this.nombre,
-    required this.precio,
+    required this.tipo,
     required this.color,
+    required this.precio,
+    required this.fechaAgregado,
     this.imagenUrl,
   });
-}
 
-class RustApiChatService {
-  static const String baseUrl = 'https://e75b-186-154-129-90.ngrok-free.app';
+  factory ProductResponse.fromJson(Map<String, dynamic> json) {
+    return ProductResponse(
+      id: json['id'].toString(),
+      nombre: json['nombre'] ?? '',
+      tipo: json['tipo'] ?? '',
+      color: json['color'] ?? '',
+      precio: double.tryParse(json['precio'].toString()) ?? 0.0,
+      fechaAgregado: json['fechaAgregado'] ?? '',
+      imagenUrl: json['imagen'], // <-- O puede ser json['imagenUrl'] si así viene
+    );
+  }
 
-  Future<ProductResponse?> getProductMatch(String mensajeUsuario) async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/productos'));
-
-      if (response.statusCode == 200) {
-        final List productos = jsonDecode(response.body);
-
-        final producto = productos.firstWhere(
-          (producto) => producto['nombre']
-              .toString()
-              .toLowerCase()
-              .contains(mensajeUsuario.toLowerCase()),
-          orElse: () => null,
-        );
-
-        if (producto != null) {
-          return ProductResponse(
-            nombre: producto['nombre'],
-            precio: producto['precio'].toDouble(),
-            color: producto['color'],
-            imagenUrl: producto['imagen'], // Asegúrate que tu API devuelve 'imagen'
-          );
-        }
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'tipo': tipo,
+      'color': color,
+      'precio': precio,
+      'fechaAgregado': fechaAgregado,
+      'imagenUrl': imagenUrl,
+    };
   }
 }
+

@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'product_response.dart'; // si lo separas en otro archivo
+import '../product/components/productR.dart';
 
 class RustApiChatService {
-  static const String baseUrl = 'https://e75b-186-154-129-90.ngrok-free.app';
+  static const String baseUrl = 'https://f286-186-154-129-90.ngrok-free.app/productos';
 
   Future<ProductResponse?> getProductMatch(String mensajeUsuario) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/productos'));
+      final response = await http.get(Uri.parse(baseUrl));
 
       if (response.statusCode == 200) {
         final List productos = jsonDecode(response.body);
@@ -27,7 +27,7 @@ class RustApiChatService {
             tipo: producto['tipo'],
             color: producto['color'],
             precio: double.tryParse(producto['precio'].toString()) ?? 0.0,
-            fechaAgregado: producto['fechaAgregado'],
+            fechaAgregado: producto['fecha_agregado'] ?? '',
             imagenUrl: producto['imagen'],
           );
         }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../chat_page.dart';
 import '../../notifications_page.dart';
 import 'chat_page.dart';
 
@@ -62,9 +63,9 @@ class BannerPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                      Icon(Icons.broken_image, size: 50, color: Colors.red),
                       SizedBox(height: 10),
-                      Text('Error al cargar la imagen', style: TextStyle(color: Colors.white)),
+                      Text('Error al cargar la imagen', style: TextStyle(color: Colors.black)),
                     ],
                   ),
                 ),
@@ -80,7 +81,7 @@ class BannerPage extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
-                icon: Icon(Icons.notifications, color: Colors.white),
+                icon: Icon(Icons.notifications, color: Colors.deepPurple),
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => NotificationsPage()),
@@ -93,11 +94,11 @@ class BannerPage extends StatelessWidget {
                   'assets/icons/chatbot_icon.svg',
                   height: 24,
                   width: 24,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(Colors.white12, BlendMode.srcIn),
                 ),
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => ChatPage()),
+                    MaterialPageRoute(builder: (_) => ChatScreen()),
                   );
                 },
               ),
