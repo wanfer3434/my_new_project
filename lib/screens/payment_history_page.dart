@@ -18,7 +18,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   // You only need to define where are your data come from
   // and ready.
   _getUsers() async {
-    var temp = await ApiService.getUsers(nrUsers: 5);
+    var temp = await RustApiChatService.getUsers(nrUsers: 5);
     setState(() {
       users = temp;
     });

@@ -2,21 +2,35 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../product/components/productR.dart';
 
-class RustApiChatService {
-  static const String baseUrl = 'https://f286-186-154-129-90.ngrok-free.app/productos';
+// Supón que esta clase User está definida en otro archivo o al final de este archivo
+class User {
+  final String id;
+  final String name;
+  final String profileImageUrl;
 
+  User({required this.id, required this.name, required this.profileImageUrl});
+}
+
+class RustApiChatService {
+  static const String baseUrl = 'http://192.168.0.21:3000';
+
+  // 🟠 Este es tu método actual
   Future<ProductResponse?> getProductMatch(String mensajeUsuario) async {
     try {
-      final response = await http.get(Uri.parse(baseUrl));
+      final response = await http.get(Uri.parse('$baseUrl/productos'));
 
       if (response.statusCode == 200) {
         final List productos = jsonDecode(response.body);
+        print('Productos cargados: $productos');
+
+        final mensajeNormalizado = mensajeUsuario.toLowerCase().replaceAll(RegExp(r'\s+'), '');
 
         final producto = productos.firstWhere(
-          (producto) => producto['nombre']
+              (producto) => producto['nombre']
               .toString()
               .toLowerCase()
-              .contains(mensajeUsuario.toLowerCase()),
+              .replaceAll(RegExp(r'\s+'), '')
+              .contains(mensajeNormalizado),
           orElse: () => null,
         );
 
@@ -27,15 +41,31 @@ class RustApiChatService {
             tipo: producto['tipo'],
             color: producto['color'],
             precio: double.tryParse(producto['precio'].toString()) ?? 0.0,
-            fechaAgregado: producto['fecha_agregado'] ?? '',
+            fechaAgregado: producto['fecha_agregado'],
             imagenUrl: producto['imagen'],
           );
         }
       }
       return null;
     } catch (e) {
-      print('Error: $e');
+      print('Error en getProductMatch: $e');
       return null;
     }
+  }
+
+  // ✅ Este es el nuevo método que te faltaba
+  static Future<List<User>> getUsers({required int nrUsers}) async {
+    // Simula una espera como si fuera de un servidor real
+    await Future.delayed(Duration(seconds: 1));
+
+    // Retorna una lista ficticia de usuarios
+    return List.generate(
+      nrUsers,
+          (index) => User(
+        id: '$index',
+        name: 'Usuario $index',
+        profileImageUrl: 'https://i.pravatar.cc/150?img=$index',
+      ),
+    );
   }
 }

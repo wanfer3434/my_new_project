@@ -18,14 +18,14 @@ class _SendPageState extends State<SendPage> {
   List<User> users = [];
 
   getFrequentUsers() async {
-    var temp = await ApiService.getUsers(nrUsers: 5);
+    var temp = await RustApiChatService.getUsers(nrUsers: 5);
     setState(() {
       frequentUsers = temp;
     });
   }
 
   getUsers() async {
-    var temp = await ApiService.getUsers(nrUsers: 5);
+    var temp = await RustApiChatService.getUsers(nrUsers: 5);
     setState(() {
       users = temp;
     });

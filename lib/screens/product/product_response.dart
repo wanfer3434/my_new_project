@@ -1,7 +1,3 @@
-// service/rust_api_chat_service.dart
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 class ProductResponse {
   final String id;
   final String nombre;
@@ -27,9 +23,11 @@ class ProductResponse {
       nombre: json['nombre'] ?? '',
       tipo: json['tipo'] ?? '',
       color: json['color'] ?? '',
-      precio: double.tryParse(json['precio'].toString()) ?? 0.0,
-      fechaAgregado: json['fechaAgregado'] ?? '',
-      imagenUrl: json['imagen'], // <-- O puede ser json['imagenUrl'] si así viene
+      precio: (json['precio'] is int)
+          ? (json['precio'] as int).toDouble()
+          : (json['precio'] ?? 0.0).toDouble(),
+      fechaAgregado: json['fecha_agregado'] ?? '',
+      imagenUrl: json['imagen'], // <- corregido aquí
     );
   }
 
@@ -40,9 +38,8 @@ class ProductResponse {
       'tipo': tipo,
       'color': color,
       'precio': precio,
-      'fechaAgregado': fechaAgregado,
-      'imagenUrl': imagenUrl,
+      'fecha_agregado': fechaAgregado, // <- corregido aquí
+      'imagen': imagenUrl, // <- corregido aquí
     };
   }
 }
-

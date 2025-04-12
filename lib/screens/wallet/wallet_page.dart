@@ -21,7 +21,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
   List<User> users = [];
 
   getUsers() async {
-    var temp = await ApiService.getUsers(nrUsers: 5);
+    var temp = await RustApiChatService.getUsers(nrUsers: 5);
     setState(() {
       users = temp;
     });

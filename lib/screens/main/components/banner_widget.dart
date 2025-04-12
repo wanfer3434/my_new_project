@@ -90,11 +90,11 @@ class BannerPage extends StatelessWidget {
               ),
               SizedBox(width: 10),
               IconButton(
-                icon: SvgPicture.asset(
-                  'assets/icons/chatbot_icon.svg',
-                  height: 24,
-                  width: 24,
-                  colorFilter: ColorFilter.mode(Colors.white12, BlendMode.srcIn),
+                icon: Image.asset(
+                  'assets/icons/virtual-assistant.png',
+                  height: 32,
+                  width: 32,
+                  color: Colors.green,  // Si quieres darle un color al icono
                 ),
                 onPressed: () {
                   Navigator.of(context).push(
