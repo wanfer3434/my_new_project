@@ -12,7 +12,7 @@ class User {
 }
 
 class RustApiChatService {
-  static const String baseUrl = 'http://192.168.0.21:3000';
+  static const String baseUrl = 'https://javierfigueroa.tail33d395.ts.net';
 
   // 🟠 Este es tu método actual
   Future<ProductResponse?> getProductMatch(String mensajeUsuario) async {

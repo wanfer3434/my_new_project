@@ -4,7 +4,7 @@ import 'package:ecommerce_int2/screens/product/components/productR.dart';
 import 'package:ecommerce_int2/models/user.dart'; // asegúrate de tener este archivo
 
 class RustApiChatService {
-  final String baseUrl = 'http://192.168.0.21:3000'; // Tu IP local
+  final String baseUrl = 'https://javierfigueroa.tail33d395.ts.net'; // Tu IP local
 
   /// Buscar producto por nombre
   Future<ProductResponse?> getProductMatch(String query) async {

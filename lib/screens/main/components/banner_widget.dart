@@ -91,10 +91,9 @@ class BannerPage extends StatelessWidget {
               SizedBox(width: 10),
               IconButton(
                 icon: Image.asset(
-                  'assets/icons/virtual-assistant.png',
+                  'assets/icons/icono_mensaje.png',
                   height: 32,
-                  width: 32,
-                  color: Colors.green,  // Si quieres darle un color al icono
+                  width: 32, // Si quieres darle un color al icono
                 ),
                 onPressed: () {
                   Navigator.of(context).push(
