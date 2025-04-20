@@ -17,24 +17,14 @@ class RustApiChatService {
   // 🟠 Este es tu método actual
   Future<ProductResponse?> getProductMatch(String mensajeUsuario) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/productos'));
+      final query = mensajeUsuario.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final response = await http.get(Uri.parse('$baseUrl/buscar?q=$query'));
 
       if (response.statusCode == 200) {
         final List productos = jsonDecode(response.body);
-        print('Productos cargados: $productos');
 
-        final mensajeNormalizado = mensajeUsuario.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-
-        final producto = productos.firstWhere(
-              (producto) => producto['nombre']
-              .toString()
-              .toLowerCase()
-              .replaceAll(RegExp(r'\s+'), '')
-              .contains(mensajeNormalizado),
-          orElse: () => null,
-        );
-
-        if (producto != null) {
+        if (productos.isNotEmpty) {
+          final producto = productos.first;
           return ProductResponse(
             id: producto['id'].toString(),
             nombre: producto['nombre'],
@@ -46,12 +36,14 @@ class RustApiChatService {
           );
         }
       }
+
       return null;
     } catch (e) {
       print('Error en getProductMatch: $e');
       return null;
     }
   }
+
 
   // ✅ Este es el nuevo método que te faltaba
   static Future<List<User>> getUsers({required int nrUsers}) async {

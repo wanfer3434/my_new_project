@@ -9,16 +9,13 @@ class RustApiChatService {
   /// Buscar producto por nombre
   Future<ProductResponse?> getProductMatch(String query) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/productos'));
+      final response = await http.get(Uri.parse('$baseUrl/buscar?q=$query'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
 
-        for (var item in data) {
-          final product = ProductResponse.fromJson(item);
-          if (product.nombre.toLowerCase().contains(query.toLowerCase())) {
-            return product;
-          }
+        if (data.isNotEmpty) {
+          return ProductResponse.fromJson(data.first);
         }
       }
     } catch (e) {
@@ -26,6 +23,7 @@ class RustApiChatService {
     }
     return null;
   }
+
 
   /// Obtener usuarios (dummy o desde API real)
   static Future<List<User>> getUsers({int nrUsers = 5}) async {
