@@ -27,7 +27,7 @@ class ProductResponse {
           ? (json['precio'] as int).toDouble()
           : (json['precio'] ?? 0.0).toDouble(),
       fechaAgregado: json['fecha_agregado'] ?? '',
-      imagenUrl: json['imagen'], // <- corregido aquí
+      imagenUrl: json['imagen'] ?? 'https://example.com/default-image.png',
     );
   }
 

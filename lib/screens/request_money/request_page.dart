@@ -1,10 +1,10 @@
-import 'package:ecommerce_int2/api_service.dart';
-import 'package:ecommerce_int2/models/user.dart';
 import 'package:ecommerce_int2/screens/request_money/request_amount_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ecommerce_int2/models/user.dart' as model_user;
+import 'package:ecommerce_int2/screens/service/rust_api_chat_service.dart'as rust_api_user;
 
 import '../../app_properties.dart';
 
@@ -14,23 +14,23 @@ class RequestPage extends StatefulWidget {
 }
 
 class _RequestPageState extends State<RequestPage> {
-  List<User> frequentUsers = [];
-  List<User> users = [];
+  List<model_user.User> frequentUsers = [];
+  List<model_user.User> users = [];
 
   Future<void> getFrequentUsers() async {
-    var temp = await RustApiChatService.getUsers(nrUsers: 5);
+    var temp = await rust_api_user.RustApiChatService.getUsers(nrUsers: 5);
     if (mounted) {
       setState(() {
-        frequentUsers = temp;
+        frequentUsers = temp.cast<model_user.User>();
       });
     }
   }
 
   Future<void> getUsers() async {
-    var temp = await RustApiChatService.getUsers(nrUsers: 5);
+    var temp = await rust_api_user.RustApiChatService.getUsers(nrUsers: 5);
     if (mounted) {
       setState(() {
-        users = temp;
+        users = temp.cast<model_user.User>();
       });
     }
   }

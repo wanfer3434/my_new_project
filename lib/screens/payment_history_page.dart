@@ -1,5 +1,5 @@
-import 'package:ecommerce_int2/api_service.dart';
-import 'package:ecommerce_int2/models/user.dart';
+import 'package:ecommerce_int2/models/user.dart' as model_user;
+import 'package:ecommerce_int2/screens/service/rust_api_chat_service.dart'as rust_api_user;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +9,7 @@ class PaymentHistoryPage extends StatefulWidget {
 }
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
-  List<User> users = [];
+  List<model_user.User> users = [];
   List<String> dates = ['24th June 2019', '29th June 2019', '2nd July 2019'];
 
   String selectedMonth = 'June 2019';
@@ -18,9 +18,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   // You only need to define where are your data come from
   // and ready.
   _getUsers() async {
-    var temp = await RustApiChatService.getUsers(nrUsers: 5);
+    var temp = await rust_api_user.RustApiChatService.getUsers(nrUsers: 5);
     setState(() {
-      users = temp;
+      users = temp.cast<model_user.User>();
     });
   }
 

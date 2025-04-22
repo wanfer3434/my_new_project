@@ -3,8 +3,9 @@ import 'package:ecommerce_int2/screens/faq_page.dart';
 import 'package:ecommerce_int2/screens/payment/payment_page.dart';
 import 'package:ecommerce_int2/screens/settings/settings_page.dart';
 import 'package:ecommerce_int2/screens/tracking_page.dart';
-import 'package:ecommerce_int2/screens/wallet/wallet_page.dart';
 import 'package:flutter/material.dart';
+
+import 'chat_page.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -58,7 +59,7 @@ class ProfilePage extends StatelessWidget {
                               icon: Image.asset('assets/icons/wallet.png'),
                               onPressed:()=> Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (_) => WalletPage())),
+                                      builder: (_) => ChatScreen())),
                             ),
                             Text(
                               'Wallet',
