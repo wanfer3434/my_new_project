@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import '../product/product_response.dart';
 
 class User {
@@ -12,35 +11,38 @@ class User {
 }
 
 class RustApiChatService {
+  // Dirección base de tu API Rust
   static const String baseUrl = 'https://javierfigueroa.tail33d395.ts.net';
 
-  /// ✅ Buscar productos por nombre (retorna una lista)
+  /// ✅ Buscar productos según el mensaje del usuario
   Future<List<ProductResponse>> getProductMatch(String mensajeUsuario) async {
     try {
-      final query = mensajeUsuario.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final response = await http.get(Uri.parse('$baseUrl/buscar?q=$query'));
+      final query = mensajeUsuario.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final uri = Uri.parse('$baseUrl/buscar?q=$query');
+
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final List productos = jsonDecode(response.body);
 
         if (productos.isNotEmpty) {
-          // Mapeamos la respuesta a una lista de ProductResponse
+          // Convertimos cada item del JSON a un ProductResponse
           return productos.map<ProductResponse>((producto) {
             return ProductResponse.fromJson(producto);
           }).toList();
         }
       }
 
-      return [];
+      return []; // No se encontraron productos
     } catch (e) {
       print('Error en getProductMatch: $e');
       return [];
     }
   }
 
-  /// Usuarios ficticios (puedes adaptar a tu API real)
+  /// Función de prueba para obtener usuarios ficticios
   static Future<List<User>> getUsers({required int nrUsers}) async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(milliseconds: 500));
 
     return List.generate(
       nrUsers,
@@ -53,27 +55,24 @@ class RustApiChatService {
   }
 }
 
+/// ✅ Ejemplo de uso manual
 void main() async {
-  // Suponiendo que se hace la llamada a la API para obtener los productos
   final _chatService = RustApiChatService();
   final userMessage = 'fundas para celular';
 
-  // Obtener la lista de productos
   final List<ProductResponse> products = await _chatService.getProductMatch(userMessage);
 
-  // Asegurándonos de que hay productos antes de acceder a ellos
   if (products.isNotEmpty) {
-    // Imprimir los productos
     for (var product in products) {
-      // Accediendo a las propiedades de cada objeto ProductResponse
-      print('Producto: ${product.nombre}');  // Accedemos a 'nombre' de cada producto
+      print('Producto: ${product.nombre}');
       print('Precio: ${product.precio}');
       print('Color: ${product.color}');
       print('Tipo: ${product.tipo}');
       print('Fecha Agregado: ${product.fechaAgregado}');
-      print('URL Imagen: ${product.imagenUrl}');
+      print('URLs Imagenes: ${product.imagenUrls.join(', ')}');
+      print('--------------------------------');
     }
   } else {
-    print('No se encontraron productos');
+    print('❌ No se encontraron productos');
   }
 }

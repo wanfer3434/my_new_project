@@ -111,17 +111,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                       SliverToBoxAdapter(
                         child: SizedBox(
                           height: 200, // Ajusta este valor según necesites
-                          child: BannerPage(
-                            imageUrl: 'https://i.imgur.com/GaEsmRG.png',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AnotherPage(),
-                                ),
-                              );
-                            },
-                          ),
+                          child: BannerPage(), // Aquí insertamos el BannerPage
                         ),
                       ),
 
