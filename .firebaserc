@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "tu-tienda-tecnologica",
-    "Tecnology": "tu-tienda-tecnologica"
+    "Tecnology": "tu-tienda-tecnologica",
+    "n": "tu-tienda-tecnologica"
   },
   "targets": {},
   "etags": {}
