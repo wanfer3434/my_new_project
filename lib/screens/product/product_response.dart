@@ -3,7 +3,7 @@ class ProductResponse {
   final String tipo;
   final String color;
   final double precio;
-  final DateTime fechaAgregado;  // Cambié a DateTime
+  final DateTime fechaAgregado;
   final List<String> imagenUrls;
 
   ProductResponse({
@@ -15,36 +15,26 @@ class ProductResponse {
     required this.imagenUrls,
   });
 
- factory ProductResponse.fromJson(Map<String, dynamic> json) {
-  List<String> imagenUrlsList = [];
+  factory ProductResponse.fromJson(Map<String, dynamic> json) {
+    // Adaptar para soportar ambos campos
+    final imagen = json['imagen'];
+    List<String> imagenes = [];
 
-  final imagenRaw = json['imagen'] ?? json['imagenUrls']; // Soporta ambos
+    if (imagen != null) {
+      if (imagen is String) {
+        imagenes = [imagen];
+      } else if (imagen is List) {
+        imagenes = List<String>.from(imagen);
+      }
+    }
 
-  if (imagenRaw != null) {
-    if (imagenRaw is String) {
-      try {
-        // Intenta decodificar si es un string tipo JSON
-        final decoded = jsonDecode(imagenRaw);
-        if (decoded is List) {
-          imagenUrlsList = List<String>.from(decoded);
-        } else {
-          imagenUrlsList = imagenRaw.split(',').map((e) => e.trim()).toList();
-        }
-      } catch (_) {
-        imagenUrlsList = imagenRaw.split(',').map((e) => e.trim()).toList();
-      }
-    } else if (imagenRaw is List) {
-      imagenUrlsList = List<String>.from(imagenRaw);
-    }
-  }
-
-  return ProductResponse(
-    nombre: json['nombre'] ?? '',
-    tipo: json['tipo'] ?? '',
-    color: json['color'] ?? '',
-    precio: double.tryParse(json['precio'].toString()) ?? 0.0,
-    fechaAgregado: json['fechaAgregado'] != null ? DateTime.parse(json['fechaAgregado']) : DateTime.now(),
-    imagenUrls: imagenUrlsList,
-  );
+    return ProductResponse(
+      nombre: json['nombre'],
+      tipo: json['tipo'],
+      color: json['color'],
+      precio: (json['precio'] as num).toDouble(),
+      fechaAgregado: DateTime.parse(json['fecha_agregado']),
+      imagenUrls: imagenes,
+    );
+  }
 }
- 
