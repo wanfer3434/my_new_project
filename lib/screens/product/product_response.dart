@@ -15,24 +15,36 @@ class ProductResponse {
     required this.imagenUrls,
   });
 
-  factory ProductResponse.fromJson(Map<String, dynamic> json) {
-    // Si 'imagenUrls' es un string con comas, separarlas y convertirlas en una lista.
-    List<String> imagenUrlsList = [];
-    if (json['imagenUrls'] != null) {
-      if (json['imagenUrls'] is String) {
-        imagenUrlsList = json['imagenUrls'].split(',').map((e) => e.trim()).toList();
-      } else if (json['imagenUrls'] is List) {
-        imagenUrlsList = List<String>.from(json['imagenUrls']);
-      }
-    }
+ factory ProductResponse.fromJson(Map<String, dynamic> json) {
+  List<String> imagenUrlsList = [];
 
-    return ProductResponse(
-      nombre: json['nombre'] ?? '',
-      tipo: json['tipo'] ?? '',
-      color: json['color'] ?? '',
-      precio: double.tryParse(json['precio'].toString()) ?? 0.0,
-      fechaAgregado: json['fechaAgregado'] != null ? DateTime.parse(json['fechaAgregado']) : DateTime.now(),
-      imagenUrls: imagenUrlsList,
-    );
-  }
+  final imagenRaw = json['imagen'] ?? json['imagenUrls']; // Soporta ambos
+
+  if (imagenRaw != null) {
+    if (imagenRaw is String) {
+      try {
+        // Intenta decodificar si es un string tipo JSON
+        final decoded = jsonDecode(imagenRaw);
+        if (decoded is List) {
+          imagenUrlsList = List<String>.from(decoded);
+        } else {
+          imagenUrlsList = imagenRaw.split(',').map((e) => e.trim()).toList();
+        }
+      } catch (_) {
+        imagenUrlsList = imagenRaw.split(',').map((e) => e.trim()).toList();
+      }
+    } else if (imagenRaw is List) {
+      imagenUrlsList = List<String>.from(imagenRaw);
+    }
+  }
+
+  return ProductResponse(
+    nombre: json['nombre'] ?? '',
+    tipo: json['tipo'] ?? '',
+    color: json['color'] ?? '',
+    precio: double.tryParse(json['precio'].toString()) ?? 0.0,
+    fechaAgregado: json['fechaAgregado'] != null ? DateTime.parse(json['fechaAgregado']) : DateTime.now(),
+    imagenUrls: imagenUrlsList,
+  );
 }
+ 
