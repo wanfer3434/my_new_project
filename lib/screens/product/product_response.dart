@@ -3,7 +3,7 @@ class ProductResponse {
   final String tipo;
   final String color;
   final double precio;
-  final DateTime fechaAgregado;  // Cambié a DateTime
+  final DateTime fechaAgregado;
   final List<String> imagenUrls;
 
   ProductResponse({
@@ -16,23 +16,25 @@ class ProductResponse {
   });
 
   factory ProductResponse.fromJson(Map<String, dynamic> json) {
-    // Si 'imagenUrls' es un string con comas, separarlas y convertirlas en una lista.
-    List<String> imagenUrlsList = [];
-    if (json['imagenUrls'] != null) {
-      if (json['imagenUrls'] is String) {
-        imagenUrlsList = json['imagenUrls'].split(',').map((e) => e.trim()).toList();
-      } else if (json['imagenUrls'] is List) {
-        imagenUrlsList = List<String>.from(json['imagenUrls']);
+    // Adaptar para soportar ambos campos
+    final imagen = json['imagen'];
+    List<String> imagenes = [];
+
+    if (imagen != null) {
+      if (imagen is String) {
+        imagenes = [imagen];
+      } else if (imagen is List) {
+        imagenes = List<String>.from(imagen);
       }
     }
 
     return ProductResponse(
-      nombre: json['nombre'] ?? '',
-      tipo: json['tipo'] ?? '',
-      color: json['color'] ?? '',
-      precio: double.tryParse(json['precio'].toString()) ?? 0.0,
-      fechaAgregado: json['fechaAgregado'] != null ? DateTime.parse(json['fechaAgregado']) : DateTime.now(),
-      imagenUrls: imagenUrlsList,
+      nombre: json['nombre'],
+      tipo: json['tipo'],
+      color: json['color'],
+      precio: (json['precio'] as num).toDouble(),
+      fechaAgregado: DateTime.parse(json['fecha_agregado']),
+      imagenUrls: imagenes,
     );
   }
 }
