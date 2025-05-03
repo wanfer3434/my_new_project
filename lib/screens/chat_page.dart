@@ -6,6 +6,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
+
   _ChatScreenState createState() => _ChatScreenState();
 }
 
@@ -31,20 +32,25 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       if (products.isNotEmpty) {
         final product = products[0];
+
+        // CORREGIDO: Acceder a lista de imágenes, no a una sola imagen
+        List<String> imageUrls = product.imagenUrls ?? [];
+
         chatHistory.add({
           'type': 'bot',
           'message':
           'Producto: ${product.nombre}\nTipo: ${product.tipo}\nColor: ${product.color}\nPrecio: \$${product.precio}\nFecha agregado: ${product.fechaAgregado}',
-          'image': product.imagenUrls, // Ahora pasas una lista de URLs de imágenes
+          'image': imageUrls,
         });
       } else {
         chatHistory.add({
           'type': 'bot',
           'message': 'Lo siento, no encontré ese producto.',
-          'image': null,
+          'image': [],
         });
       }
     });
+    ;
   }
 
   void _showImageGallery(List<String> imageUrls, int index) {
@@ -87,26 +93,31 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(message['message']),
                 // Mostrar las imágenes solo si están disponibles
-                if (message['image'] != null && message['image'].isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: GestureDetector(
-                      onTap: () =>
-                          _showImageGallery(message['image'], 0), // Mostrar las imágenes
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          message['image'][0], // Usar la primera imagen de la lista
-                          height: 160,
-                          width: 160,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Text('Imagen no disponible'),
-                        ),
-                      ),
+              if (message['image'] != null && message['image'].isNotEmpty) ...[
+                  SizedBox(
+                    height: 160,
+                    child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: message['image'].length,
+                    separatorBuilder: (context, index) => SizedBox(width: 8),
+                    itemBuilder: (context, imgIndex) {
+                        return GestureDetector(
+                           onTap: () => _showImageGallery(message['image'], imgIndex),
+                           child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                              message['image'][imgIndex],
+                              width: 160,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                Text('Imagen no disponible'),
+                              ),
+                           ),
+                        );
+                        },
                     ),
                   ),
-                ],
+               ],
               ],
             ),
           ),
