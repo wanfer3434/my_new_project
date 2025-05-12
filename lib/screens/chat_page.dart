@@ -6,7 +6,6 @@ import 'package:photo_view/photo_view_gallery.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
-
   _ChatScreenState createState() => _ChatScreenState();
 }
 
@@ -25,23 +24,25 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
+    // Llamada a la API para obtener productos
     final List<ProductResponse> products = await _chatService.getProductMatch(userMessage);
 
     print('Productos recibidos: $products');
 
     setState(() {
       if (products.isNotEmpty) {
-        final product = products[0];
-
-        // CORREGIDO: Acceder a lista de imágenes, no a una sola imagen
-        List<String> imageUrls = product.imagenUrls ?? [];
-
-        chatHistory.add({
-          'type': 'bot',
-          'message':
-          'Producto: ${product.nombre}\nTipo: ${product.tipo}\nColor: ${product.color}\nPrecio: \$${product.precio}\nFecha agregado: ${product.fechaAgregado}',
-          'image': imageUrls,
-        });
+        for (var product in products) {
+          chatHistory.add({
+            'type': 'bot',
+            'message':
+            'Referencia: ${product.referencia}\n'
+                'Categoría: ${product.categoria}\n'
+                'Precio: \$${product.precio}\n'
+                'Cantidad: ${product.cantidad}\n'
+                'Fecha venta: ${product.fechaVenta}',
+            'image': product.imagen != null ? [product.imagen!] : [],
+          });
+        }
       } else {
         chatHistory.add({
           'type': 'bot',
@@ -50,7 +51,6 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
     });
-    ;
   }
 
   void _showImageGallery(List<String> imageUrls, int index) {
@@ -88,36 +88,35 @@ class _ChatScreenState extends State<ChatScreen> {
           SizedBox(width: 8),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              isUser ? CrossAxisAlignment.start : CrossAxisAlignment.start,
+              crossAxisAlignment: isUser ? CrossAxisAlignment.start : CrossAxisAlignment.start,
               children: [
                 Text(message['message']),
                 // Mostrar las imágenes solo si están disponibles
-              if (message['image'] != null && message['image'].isNotEmpty) ...[
+                if (message['image'] != null && message['image'].isNotEmpty) ...[
                   SizedBox(
                     height: 160,
                     child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: message['image'].length,
-                    separatorBuilder: (context, index) => SizedBox(width: 8),
-                    itemBuilder: (context, imgIndex) {
+                      scrollDirection: Axis.horizontal,
+                      itemCount: message['image'].length,
+                      separatorBuilder: (context, index) => SizedBox(width: 8),
+                      itemBuilder: (context, imgIndex) {
                         return GestureDetector(
-                           onTap: () => _showImageGallery(message['image'], imgIndex),
-                           child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
+                          onTap: () => _showImageGallery(message['image'], imgIndex),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
                               message['image'][imgIndex],
                               width: 160,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                                Text('Imagen no disponible'),
-                              ),
-                           ),
+                                  Text('Imagen no disponible'),
+                            ),
+                          ),
                         );
-                        },
+                      },
                     ),
                   ),
-               ],
+                ],
               ],
             ),
           ),

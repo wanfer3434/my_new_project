@@ -1,40 +1,30 @@
 class ProductResponse {
-  final String nombre;
-  final String tipo;
-  final String color;
+  final String referencia;
+  final String categoria;
   final double precio;
-  final DateTime fechaAgregado;
-  final List<String> imagenUrls;
+  final DateTime? fechaVenta;
+  final String? imagen;
+  final int cantidad;
 
   ProductResponse({
-    required this.nombre,
-    required this.tipo,
-    required this.color,
+    required this.referencia,
+    required this.categoria,
     required this.precio,
-    required this.fechaAgregado,
-    required this.imagenUrls,
+    required this.fechaVenta,
+    required this.imagen,
+    required this.cantidad,
   });
 
   factory ProductResponse.fromJson(Map<String, dynamic> json) {
-    // Adaptar para soportar ambos campos
-    final imagen = json['imagen'];
-    List<String> imagenes = [];
-
-    if (imagen != null) {
-      if (imagen is String) {
-        imagenes = [imagen];
-      } else if (imagen is List) {
-        imagenes = List<String>.from(imagen);
-      }
-    }
-
     return ProductResponse(
-      nombre: json['nombre'],
-      tipo: json['tipo'],
-      color: json['color'],
-      precio: (json['precio'] as num).toDouble(),
-      fechaAgregado: DateTime.parse(json['fecha_agregado']),
-      imagenUrls: imagenes,
+      referencia: json['referencia'] ?? '',
+      categoria: json['categoria'] ?? '',
+      precio: (json['precio'] ?? 0).toDouble(),
+      fechaVenta: json['fecha_venta'] is String
+          ? DateTime.tryParse(json['fecha_venta']) ?? DateTime(1970, 1, 1) // Valor por defecto si no se puede parsear
+          : null,
+      imagen: json['imagen'] ?? 'https://via.placeholder.com/150', // Imagen predeterminada
+      cantidad: json['cantidad'] ?? 0,
     );
   }
 }

@@ -22,22 +22,26 @@ class RustApiChatService {
 
       final response = await http.get(uri);
 
+      // Verifica si la respuesta fue exitosa
       if (response.statusCode == 200) {
         final List productos = jsonDecode(response.body);
 
+        // Si se encuentran productos, los decodificamos y retornamos
         if (productos.isNotEmpty) {
-          // Convertimos cada item del JSON a un ProductResponse
           return productos.map<ProductResponse>((producto) {
             return ProductResponse.fromJson(producto);
           }).toList();
+        } else {
+          print('❌ No se encontraron productos');
         }
+      } else {
+        print('Error al obtener productos: ${response.statusCode}');
       }
-
-      return []; // No se encontraron productos
     } catch (e) {
       print('Error en getProductMatch: $e');
-      return [];
     }
+
+    return []; // Devuelve una lista vacía en caso de error o si no se encuentran productos
   }
 
   /// Función de prueba para obtener usuarios ficticios
@@ -64,12 +68,12 @@ void main() async {
 
   if (products.isNotEmpty) {
     for (var product in products) {
-      print('Producto: ${product.nombre}');
-      print('Precio: ${product.precio}');
-      print('Color: ${product.color}');
-      print('Tipo: ${product.tipo}');
-      print('Fecha Agregado: ${product.fechaAgregado}');
-      print('URLs Imagenes: ${product.imagenUrls.join(', ')}');
+      print('Referencia: ${product.referencia}');
+      print('Categoría: ${product.categoria}');
+      print('Precio: \$${product.precio}');
+      print('Fecha de Venta: ${product.fechaVenta}');
+      print('Imagen: ${product.imagen}');
+      print('Cantidad: ${product.cantidad}');
       print('--------------------------------');
     }
   } else {
