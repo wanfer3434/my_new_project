@@ -3,6 +3,7 @@ import 'service/rust_api_chat_service.dart'; // Tu clase de API
 import 'product/product_response.dart'; // Modelo del producto
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -12,8 +13,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final RustApiChatService _chatService = RustApiChatService();
-
   List<Map<String, dynamic>> chatHistory = [];
+  int _currentImgIndex = 0;
 
   void sendMessage(String userMessage) async {
     if (userMessage.isEmpty) return;
@@ -24,23 +25,33 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
-    // Llamada a la API para obtener productos
-    final List<ProductResponse> products = await _chatService.getProductMatch(userMessage);
+    final String lowerMessage = userMessage.toLowerCase();
 
-    print('Productos recibidos: $products');
+    if (lowerMessage.contains("abogado") || lowerMessage.contains("asesoría") || lowerMessage.contains("legal")) {
+      // Solicitar solo respuesta textual
+      final respuesta = await _chatService.getChatbotResponse(userMessage);
+      setState(() {
+        chatHistory.add({
+          'type': 'bot',
+          'message': respuesta,
+          'image': [], // Sin imágenes ni precios
+        });
+      });
+      return;
+    }
+
+    // Para otros mensajes, obtener productos
+    final List<ProductResponse> products = await _chatService.getProductMatch(userMessage);
 
     setState(() {
       if (products.isNotEmpty) {
         for (var product in products) {
           chatHistory.add({
             'type': 'bot',
-            'message':
-            'Referencia: ${product.referencia}\n'
-                'Categoría: ${product.categoria}\n'
-                'Precio: \$${product.precio}\n'
-                'Cantidad: ${product.cantidad}\n'
-                'Fecha venta: ${product.fechaVenta}',
-            'image': product.imagen != null ? [product.imagen!] : [],
+            'message': 'Referencia: ${product.referencia}\nPrecio: \$${product.precio}',
+            'image': product.imagen != null
+                ? product.imagen!.split(',').map((e) => e.trim()).toList()
+                : [],
           });
         }
       } else {
@@ -58,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: Text('Imágenes del producto')),
+          appBar: AppBar(title: const Text('Imágenes del producto')),
           body: PhotoViewGallery.builder(
             itemCount: imageUrls.length,
             builder: (context, index) {
@@ -68,8 +79,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 maxScale: PhotoViewComputedScale.covered,
               );
             },
-            scrollPhysics: BouncingScrollPhysics(),
-            backgroundDecoration: BoxDecoration(color: Colors.black),
+            scrollPhysics: const BouncingScrollPhysics(),
+            backgroundDecoration: const BoxDecoration(color: Colors.black),
             pageController: PageController(initialPage: index),
           ),
         ),
@@ -79,48 +90,117 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget buildMessage(Map<String, dynamic> message) {
     final isUser = message['type'] == 'user';
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(isUser ? Icons.person : Icons.smart_toy),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: isUser ? CrossAxisAlignment.start : CrossAxisAlignment.start,
-              children: [
-                Text(message['message']),
-                // Mostrar las imágenes solo si están disponibles
-                if (message['image'] != null && message['image'].isNotEmpty) ...[
-                  SizedBox(
-                    height: 160,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: message['image'].length,
-                      separatorBuilder: (context, index) => SizedBox(width: 8),
-                      itemBuilder: (context, imgIndex) {
-                        return GestureDetector(
-                          onTap: () => _showImageGallery(message['image'], imgIndex),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              message['image'][imgIndex],
-                              width: 160,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Text('Imagen no disponible'),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ],
+
+    if (isUser) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade100,
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Text(message['message']),
           ),
-        ],
+        ),
+      );
+    }
+
+    final List<String> imageUrls = List<String>.from(message['image'] ?? []);
+    final String content = message['message'];
+
+    final RegExp referenciaRegex = RegExp(r"Referencia:\s*(.*)");
+    final RegExp precioRegex = RegExp(r"Precio:\s*\$(.*)");
+
+    final String referencia = referenciaRegex.firstMatch(content)?.group(1) ?? "";
+    final String precio = precioRegex.firstMatch(content)?.group(1) ?? "";
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (imageUrls.isNotEmpty) ...[
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return Column(
+                      children: [
+                        CarouselSlider.builder(
+                          itemCount: imageUrls.length,
+                          itemBuilder: (context, imgIndex, realIndex) {
+                            return GestureDetector(
+                              onTap: () => _showImageGallery(imageUrls, imgIndex),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  imageUrls[imgIndex],
+                                  fit: BoxFit.cover,
+                                  width: MediaQuery.of(context).size.width,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                  const Text('Imagen no disponible'),
+                                ),
+                              ),
+                            );
+                          },
+                          options: CarouselOptions(
+                            height: 200,
+                            enlargeCenterPage: true,
+                            autoPlay: true,
+                            onPageChanged: (index, reason) {
+                              setState(() => _currentImgIndex = index);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: imageUrls.asMap().entries.map((entry) {
+                            return Container(
+                              width: 8.0,
+                              height: 8.0,
+                              margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _currentImgIndex == entry.key
+                                    ? Colors.blueAccent
+                                    : Colors.grey,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+              // Si no hay imagenes, mostramos solo el mensaje (como en el caso de asesoría legal)
+              if (imageUrls.isEmpty) ...[
+                Text(
+                  content,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ] else ...[
+                Text(
+                  'Referencia: $referencia',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Precio: \$$precio',
+                  style: const TextStyle(color: Colors.green, fontSize: 16),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -128,7 +208,13 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Chatbot Productos")),
+      appBar: AppBar(
+        title: const Text(
+          "Catálogo Asistente",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.deepPurple,
+      ),
       body: Column(
         children: [
           Expanded(
@@ -147,12 +233,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(labelText: 'Escribe una referencia...'),
+                    decoration: const InputDecoration(
+                      labelText: 'Escribe una referencia...',
+                      border: OutlineInputBorder(),
+                    ),
                     onSubmitted: sendMessage,
                   ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
+                  color: Colors.deepPurple,
                   onPressed: () => sendMessage(_controller.text),
                 ),
               ],

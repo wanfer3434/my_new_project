@@ -7,11 +7,15 @@ class User {
   final String name;
   final String profileImageUrl;
 
-  User({required this.id, required this.name, required this.profileImageUrl});
+  User({
+    required this.id,
+    required this.name,
+    required this.profileImageUrl,
+  });
 }
 
 class RustApiChatService {
-  // Dirección base de tu API Rust
+  // Dirección base de tu API en Rust
   static const String baseUrl = 'https://javierfigueroa.tail33d395.ts.net';
 
   /// ✅ Buscar productos según el mensaje del usuario
@@ -22,29 +26,45 @@ class RustApiChatService {
 
       final response = await http.get(uri);
 
-      // Verifica si la respuesta fue exitosa
       if (response.statusCode == 200) {
-        final List productos = jsonDecode(response.body);
+        final List<dynamic> productos = jsonDecode(response.body);
 
-        // Si se encuentran productos, los decodificamos y retornamos
         if (productos.isNotEmpty) {
           return productos.map<ProductResponse>((producto) {
             return ProductResponse.fromJson(producto);
           }).toList();
         } else {
-          print('❌ No se encontraron productos');
+          print('❌ No se encontraron productos que coincidan.');
         }
       } else {
-        print('Error al obtener productos: ${response.statusCode}');
+        print('❌ Error del servidor al obtener productos: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en getProductMatch: $e');
+      print('❌ Excepción en getProductMatch: $e');
     }
 
-    return []; // Devuelve una lista vacía en caso de error o si no se encuentran productos
+    return [];
   }
 
-  /// Función de prueba para obtener usuarios ficticios
+  /// ✅ Obtener respuesta del chatbot desde la API en Rust
+  Future<String> getChatbotResponse(String mensajeUsuario) async {
+    try {
+      final uri = Uri.parse('$baseUrl/chatbot?q=${Uri.encodeComponent(mensajeUsuario)}');
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        return jsonData['respuesta'] ?? '⚠️ No se obtuvo respuesta del chatbot.';
+      } else {
+        return '❌ Error del servidor: ${response.statusCode}';
+      }
+    } catch (e) {
+      return '❌ Error al obtener respuesta del chatbot: $e';
+    }
+  }
+
+  /// ✅ Obtener lista ficticia de usuarios (modo demo)
   static Future<List<User>> getUsers({required int nrUsers}) async {
     await Future.delayed(Duration(milliseconds: 500));
 
@@ -56,27 +76,5 @@ class RustApiChatService {
         profileImageUrl: 'https://i.pravatar.cc/150?img=$index',
       ),
     );
-  }
-}
-
-/// ✅ Ejemplo de uso manual
-void main() async {
-  final _chatService = RustApiChatService();
-  final userMessage = 'fundas para celular';
-
-  final List<ProductResponse> products = await _chatService.getProductMatch(userMessage);
-
-  if (products.isNotEmpty) {
-    for (var product in products) {
-      print('Referencia: ${product.referencia}');
-      print('Categoría: ${product.categoria}');
-      print('Precio: \$${product.precio}');
-      print('Fecha de Venta: ${product.fechaVenta}');
-      print('Imagen: ${product.imagen}');
-      print('Cantidad: ${product.cantidad}');
-      print('--------------------------------');
-    }
-  } else {
-    print('❌ No se encontraron productos');
   }
 }
