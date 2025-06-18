@@ -113,7 +113,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             }
           },
           backgroundColor: Colors.green,
-          child: Icon(Icons.whatsapp, color: Colors.white),
+          child: Icon(Icons.chat, color: Colors.red),
         ),
         body: CustomPaint(
           painter: MainBackground(),
