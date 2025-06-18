@@ -10,6 +10,7 @@ import '../../app_properties.dart';
 import '../../custom_background.dart';
 import '../../models/local_product_list.dart';
 import '../category/category_list_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'components/AnotherPage.dart';
 import 'components/banner_widget.dart';
@@ -113,7 +114,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             }
           },
           backgroundColor: Colors.green,
-          child: Icon(Icons.chat, color: Colors.red),
+          child: FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
         ),
         body: CustomPaint(
           painter: MainBackground(),
