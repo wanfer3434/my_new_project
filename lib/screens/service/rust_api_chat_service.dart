@@ -21,7 +21,8 @@ class RustApiChatService {
   /// ✅ Buscar productos según el mensaje del usuario
   Future<List<ProductResponse>> getProductMatch(String mensajeUsuario) async {
     try {
-      final query = mensajeUsuario.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final query =
+          mensajeUsuario.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '');
       final uri = Uri.parse('$baseUrl/buscar?q=$query');
 
       final response = await http.get(uri);
@@ -37,7 +38,8 @@ class RustApiChatService {
           print('❌ No se encontraron productos que coincidan.');
         }
       } else {
-        print('❌ Error del servidor al obtener productos: ${response.statusCode}');
+        print(
+            '❌ Error del servidor al obtener productos: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ Excepción en getProductMatch: $e');
@@ -49,13 +51,15 @@ class RustApiChatService {
   /// ✅ Obtener respuesta del chatbot desde la API en Rust
   Future<String> getChatbotResponse(String mensajeUsuario) async {
     try {
-      final uri = Uri.parse('$baseUrl/chatbot?q=${Uri.encodeComponent(mensajeUsuario)}');
+      final uri = Uri.parse(
+          '$baseUrl/chatbot?q=${Uri.encodeComponent(mensajeUsuario)}');
 
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        return jsonData['respuesta'] ?? '⚠️ No se obtuvo respuesta del chatbot.';
+        return jsonData['respuesta'] ??
+            '⚠️ No se obtuvo respuesta del chatbot.';
       } else {
         return '❌ Error del servidor: ${response.statusCode}';
       }
@@ -70,7 +74,7 @@ class RustApiChatService {
 
     return List.generate(
       nrUsers,
-          (index) => User(
+      (index) => User(
         id: '$index',
         name: 'Usuario $index',
         profileImageUrl: 'https://i.pravatar.cc/150?img=$index',
