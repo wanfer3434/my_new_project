@@ -35,13 +35,13 @@ class _BannerPageState extends State<BannerPage> {
   // Función para obtener banners de la API
   Future<List<String>> fetchBanners() async {
     final response = await http.get(
-      Uri.parse('https://javierfigueroa.tail33d395.ts.net/banners'),
+      Uri.parse('https://javier.tail1d9055.ts.net/banners'),
     );
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       return data.map((banner) =>
-      'https://javierfigueroa.tail33d395.ts.net/static/images/${banner['archivo_imagen']}'
+      'https://javier.tail1d9055.ts.net/static/images/${banner['archivo_imagen']}'
       ).toList();
     } else {
       throw Exception('Error al cargar los banners');
