@@ -16,11 +16,10 @@ class User {
 
 class RustApiChatService {
   // Dirección base de tu API en Rust
-<<<<<<< HEAD
-  static const String baseUrl = 'https://javier.tail1d9055.ts.net';
-=======
+
+
   static const String baseUrl = 'https://javier.tail1d9055.ts.net/';
->>>>>>> 9bc4e9a (fix: actualizar URL banners en Flutter)
+
 
   /// ✅ Buscar productos según el mensaje del usuario
   Future<List<ProductResponse>> getProductMatch(String mensajeUsuario) async {
