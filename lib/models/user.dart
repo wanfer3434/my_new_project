@@ -1,10 +1,10 @@
-import 'package:ecommerce_int2/models/dod.dart';
-import 'package:ecommerce_int2/models/id.dart';
-import 'package:ecommerce_int2/models/location.dart';
-import 'package:ecommerce_int2/models/loging.dart';
-import 'package:ecommerce_int2/models/name.dart';
-import 'package:ecommerce_int2/models/picture.dart';
-import 'package:ecommerce_int2/models/registered.dart';
+import 'package:my_new_project/models/dod.dart';
+import 'package:my_new_project/models/id.dart';
+import 'package:my_new_project/models/location.dart';
+import 'package:my_new_project/models/loging.dart';
+import 'package:my_new_project/models/name.dart';
+import 'package:my_new_project/models/picture.dart';
+import 'package:my_new_project/models/registered.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'user.g.dart';
 

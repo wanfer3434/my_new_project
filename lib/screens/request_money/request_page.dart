@@ -1,10 +1,10 @@
-import 'package:ecommerce_int2/screens/request_money/request_amount_page.dart';
+import 'package:my_new_project/screens/request_money/request_amount_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:ecommerce_int2/models/user.dart' as model_user;
-import 'package:ecommerce_int2/screens/service/rust_api_chat_service.dart'as rust_api_user;
+import 'package:my_new_project/models/user.dart' as model_user;
+import 'package:my_new_project/screens/service/rust_api_chat_service.dart'as rust_api_user;
 
 import '../../app_properties.dart';
 

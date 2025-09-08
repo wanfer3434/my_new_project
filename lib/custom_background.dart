@@ -1,4 +1,4 @@
-import 'package:ecommerce_int2/app_properties.dart';
+import 'package:my_new_project/app_properties.dart';
 import 'package:flutter/material.dart';
 const Color transparentPink = Color.fromARGB(150, 255, 182, 193); // Rosado transparente
 

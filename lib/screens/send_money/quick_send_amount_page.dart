@@ -1,6 +1,6 @@
-import 'package:ecommerce_int2/app_properties.dart';
-import 'package:ecommerce_int2/models/user.dart';
-import 'package:ecommerce_int2/screens/request_money/receive_page.dart';
+import 'package:my_new_project/app_properties.dart';
+import 'package:my_new_project/models/user.dart';
+import 'package:my_new_project/screens/request_money/receive_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'category_card.dart';
 import 'recommended_list.dart';
-import 'package:ecommerce_int2/screens/category/category_provider.dart';
+import 'package:my_new_project/screens/category/category_provider.dart';
 
 class TabView extends StatefulWidget {
   final TabController tabController;

@@ -1,4 +1,4 @@
-import 'package:ecommerce_int2/models/category.dart';
+import 'package:my_new_project/models/category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';

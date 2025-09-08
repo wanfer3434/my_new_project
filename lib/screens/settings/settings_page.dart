@@ -1,9 +1,9 @@
-import 'package:ecommerce_int2/app_properties.dart';
-import 'package:ecommerce_int2/custom_background.dart';
-import 'package:ecommerce_int2/screens/settings/change_country.dart';
-import 'package:ecommerce_int2/screens/settings/change_password_page.dart';
-import 'package:ecommerce_int2/screens/settings/legal_about_page.dart';
-import 'package:ecommerce_int2/screens/settings/notifications_settings_page.dart';
+import 'package:my_new_project/app_properties.dart';
+import 'package:my_new_project/custom_background.dart';
+import 'package:my_new_project/screens/settings/change_country.dart';
+import 'package:my_new_project/screens/settings/change_password_page.dart';
+import 'package:my_new_project/screens/settings/legal_about_page.dart';
+import 'package:my_new_project/screens/settings/notifications_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

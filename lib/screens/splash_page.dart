@@ -1,4 +1,4 @@
-import 'package:ecommerce_int2/app_properties.dart';
+import 'package:my_new_project/app_properties.dart';
 import 'package:flutter/material.dart';
 import '../firestore_service.dart'; // Importar el servicio correctamente
 import 'intro_page.dart';

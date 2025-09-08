@@ -1,5 +1,5 @@
-import 'package:ecommerce_int2/app_properties.dart';
-import 'package:ecommerce_int2/screens/payment/promo_item.dart';
+import 'package:my_new_project/app_properties.dart';
+import 'package:my_new_project/screens/payment/promo_item.dart';
 import 'package:flutter/material.dart';
 
 class UnpaidPage extends StatefulWidget {

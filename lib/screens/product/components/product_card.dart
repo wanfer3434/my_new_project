@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:ecommerce_int2/models/product.dart';
-import 'package:ecommerce_int2/screens/product/product_page.dart';
+import 'package:my_new_project/models/product.dart';
+import 'package:my_new_project/screens/product/product_page.dart';
 
 class ProductCard extends StatefulWidget {
   final Product product;

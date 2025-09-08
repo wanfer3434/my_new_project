@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ecommerce_int2/models/product.dart';
-import 'package:ecommerce_int2/screens/profile_page.dart';
-import 'package:ecommerce_int2/screens/shop/check_out_page.dart';
+import 'package:my_new_project/models/product.dart';
+import 'package:my_new_project/screens/profile_page.dart';
+import 'package:my_new_project/screens/shop/check_out_page.dart';
 
 import '../../app_properties.dart';
 import '../../custom_background.dart';
@@ -19,7 +19,7 @@ import 'components/product_list.dart';
 import 'components/tab_view.dart';
 import 'components/brand_slider.dart';
 
-import 'package:ecommerce_int2/screens/category/category_provider.dart';
+import 'package:my_new_project/screens/category/category_provider.dart';
 
 class MainPage extends StatefulWidget {
   @override

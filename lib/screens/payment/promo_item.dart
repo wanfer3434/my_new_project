@@ -1,7 +1,7 @@
-import 'package:ecommerce_int2/app_properties.dart';
-import 'package:ecommerce_int2/models/product.dart';
-import 'package:ecommerce_int2/screens/product/components/color_list.dart';
-import 'package:ecommerce_int2/screens/product/components/shop_product.dart';
+import 'package:my_new_project/app_properties.dart';
+import 'package:my_new_project/models/product.dart';
+import 'package:my_new_project/screens/product/components/color_list.dart';
+import 'package:my_new_project/screens/product/components/shop_product.dart';
 import 'package:flutter/material.dart';
 
 class PromoItem extends StatelessWidget {

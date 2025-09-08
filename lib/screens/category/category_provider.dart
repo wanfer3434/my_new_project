@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ecommerce_int2/models/category.dart';
+import 'package:my_new_project/models/category.dart';
 
 class CategoryProvider with ChangeNotifier {
   List<Category> _categories = [

@@ -1,4 +1,4 @@
-import 'package:ecommerce_int2/models/product.dart';
+import 'package:my_new_project/models/product.dart';
 
 // Clase que gestiona productos locales
 class LocalProductService {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ecommerce_int2/screens/main/components/category_card.dart'; // Importa CategoryCard desde la ubicación correcta
+import 'package:my_new_project/screens/main/components/category_card.dart'; // Importa CategoryCard desde la ubicación correcta
 
 class StaggeredCardCard extends StatefulWidget {
   final Color begin;

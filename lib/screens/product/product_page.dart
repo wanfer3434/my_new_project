@@ -1,6 +1,6 @@
-import 'package:ecommerce_int2/app_properties.dart';
-import 'package:ecommerce_int2/models/product.dart';
-import 'package:ecommerce_int2/screens/search_page.dart';
+import 'package:my_new_project/app_properties.dart';
+import 'package:my_new_project/models/product.dart';
+import 'package:my_new_project/screens/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

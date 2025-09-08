@@ -1,5 +1,5 @@
-import 'package:ecommerce_int2/models/user.dart' as model_user;
-import 'package:ecommerce_int2/screens/service/rust_api_chat_service.dart'as rust_api_user;
+import 'package:my_new_project/models/user.dart' as model_user;
+import 'package:my_new_project/screens/service/rust_api_chat_service.dart'as rust_api_user;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

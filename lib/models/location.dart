@@ -1,5 +1,5 @@
-import 'package:ecommerce_int2/models/coordinates.dart';
-import 'package:ecommerce_int2/models/timezone.dart';
+import 'package:my_new_project/models/coordinates.dart';
+import 'package:my_new_project/models/timezone.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'location.g.dart';
 
