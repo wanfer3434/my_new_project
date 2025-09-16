@@ -123,12 +123,12 @@ class _BannerPageState extends State<BannerPage> {
                   },
                   child: Container(
                     width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.4,
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
                       child: Image.network(
                         snapshot.data![index],
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
+                        width: double.infinity,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
