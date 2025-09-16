@@ -127,7 +127,7 @@ class _BannerPageState extends State<BannerPage> {
                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
                       child: Image.network(
                         snapshot.data![index],
-                        height: MediaQuery.of(context).size.height * 0.6,
+                        height: duble.infinity,
                         width: double.infinity,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
