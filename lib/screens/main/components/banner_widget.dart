@@ -128,6 +128,8 @@ class _BannerPageState extends State<BannerPage> {
                       child: Image.network(
                         snapshot.data![index],
                         width: double.infinity,
+  height: MediaQuery.of(context).size.height * 0.3,
+                        fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
