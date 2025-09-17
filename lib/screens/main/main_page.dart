@@ -127,7 +127,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                     return <Widget>[
                       SliverToBoxAdapter(
                         child: SizedBox(
-                          height: 200,
+                          height: 300,
                           child: BannerPage(), // Tu banner actual
                         ),
                       ),
