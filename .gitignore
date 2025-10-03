@@ -38,6 +38,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 build/
+**/doc/api/
 
 # =========================
 # iOS
@@ -61,7 +62,31 @@ android/app/profile
 android/app/release
 
 # =========================
+# Linux / macOS / Windows
+# =========================
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+windows/flutter/ephemeral/
+
+# =========================
 # Archivos de símbolos / ofuscación
 # =========================
 app.*.symbols
 app.*.map.json
+
+# =========================
+# Archivos grandes innecesarios
+# =========================
+*.apk
+*.aab
+*.ipa
+*.zip
+*.tar.gz
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.jks
+*.keystore
+ngrok*
