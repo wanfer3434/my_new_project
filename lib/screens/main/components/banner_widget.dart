@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../../chat_page.dart';
 import '../../notifications_page.dart';
+import 'banner_upload.dart';
 
 class BannerPage extends StatefulWidget {
   const BannerPage({Key? key}) : super(key: key);
@@ -35,13 +36,13 @@ class _BannerPageState extends State<BannerPage> {
   // Función para obtener banners de la API
   Future<List<String>> fetchBanners() async {
     final response = await http.get(
-      Uri.parse('https://javier.tail1d9055.ts.net/banners'),
+      Uri.parse('https://javier.tail33d395.ts.net/banners'),
     );
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       return data.map((banner) =>
-      'https://javier.tail1d9055.ts.net/static/images/${banner['archivo_imagen']}'
+      'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}'
       ).toList();
     } else {
       throw Exception('Error al cargar los banners');
@@ -99,9 +100,9 @@ class _BannerPageState extends State<BannerPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.orange.shade900,
-                    Colors.orange.shade600,
-                    Colors.orange.shade300,
+                    Colors.white70,
+                    Colors.white60,
+                    Colors.white70,
                   ],
                 ),
               ),
@@ -123,13 +124,13 @@ class _BannerPageState extends State<BannerPage> {
                   },
                   child: Container(
                     width: double.infinity,
+                    // 🔴 Se quitó el height fijo aquí
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
                       child: Image.network(
                         snapshot.data![index],
+                        fit: BoxFit.contain,  // ✅ cambio aquí
                         width: double.infinity,
-  height: MediaQuery.of(context).size.height * 0.3,
-                        fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
@@ -157,27 +158,33 @@ class _BannerPageState extends State<BannerPage> {
                 );
               },
             ),
-
+            // Botón flotante separado
+            BannerUpload.uploadButton(context, () {
+              setState(() {
+                banners = fetchBanners();
+              });
+            }),
             // Botones de notificación y chat
             Positioned(
-              top: 40,
-              right: 16,
-              child: Row(
+              top: 10,
+              right: 5,
+              child: Column(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.notifications, color: Colors.deepPurple),
+                    iconSize: 40, // 🔹 Tamaño más grande
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => NotificationsPage()),
                       );
                     },
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 20),
                   IconButton(
                     icon: Image.asset(
                       'assets/icons/icono_mensaje.png',
-                      height: 32,
-                      width: 32,
+                      height: 40,
+                      width: 40,
                     ),
                     onPressed: () {
                       Navigator.of(context).push(

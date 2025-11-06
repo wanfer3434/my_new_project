@@ -8,21 +8,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Explora nuestra app de accesorios tecnológicos, cámaras, estuches y más.">
 
-  <!-- 🌐 Metaetiquetas Open Graph para redes sociales -->
+  <!-- 🌐 Metaetiquetas Open Graph -->
   <meta property="og:title" content="Tienda Tech - Accesorios y Gadgets">
   <meta property="og:description" content="Descubre los mejores estuches, protectores, cámaras y más en nuestra app.">
-  <meta property="og:image" content="https://javier.tail1d9055.ts.net/get-screenshot">
-  <meta property="og:url" content="https://tu-tienda-tecnologica.web.app">
+  <meta property="og:image" content="https://javier.tail33d395.ts.net/og-image">
+  <meta property="og:url" content="https://tu-tienda-twin-yogo.web.app">
   <meta property="og:type" content="website">
   <meta property="fb:app_id" content="2191756187968390">
 
-  <!-- Meta etiquetas para Twitter -->
+  <!-- 🐦 Meta etiquetas para Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Tienda Tech - Accesorios y Gadgets">
   <meta name="twitter:description" content="Descubre los mejores estuches, protectores, cámaras y más en nuestra app.">
-  <meta name="twitter:image" content="https://javier.tail1d9055.ts.net/get-screenshot">
+  <meta name="twitter:image" content="https://javier.tail33d395.ts.net/og-image">
 
-  <!-- iOS meta tags & icons -->
+  <!-- 📱 iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Tienda Tech">
@@ -33,7 +33,22 @@
 
   <title>Tienda Tech</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- 🕓 Script para actualizar dinámicamente la imagen del banner -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const timestamp = Date.now();
+      const newImageUrl = `https://javier.tail33d395.ts.net/get-screenshot?ts=${timestamp}`;
+
+      // Actualizar dinámicamente las metaetiquetas OG y Twitter
+      document.querySelector('meta[property="og:image"]').setAttribute("content", newImageUrl);
+      document.querySelector('meta[name="twitter:image"]').setAttribute("content", newImageUrl);
+
+      console.log("🖼 Imagen OG actualizada a:", newImageUrl);
+    });
+  </script>
 </head>
+
 <body>
 <script src="flutter_bootstrap.js" async></script>
 </body>

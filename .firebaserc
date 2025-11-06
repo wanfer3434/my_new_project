@@ -1,9 +1,15 @@
 {
   "projects": {
-    "default": "tu-tienda-tecnologica",
-    "Tecnology": "tu-tienda-tecnologica",
-    "n": "tu-tienda-tecnologica"
+    "default": "javierproject-6e7b5"
   },
-  "targets": {},
+  "targets": {
+    "javierproject-6e7b5": {
+      "hosting": {
+        "tu-tienda-twin-yogo": [
+          "javierproject-6e7b5"
+        ]
+      }
+    }
+  },
   "etags": {}
 }

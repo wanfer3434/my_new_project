@@ -18,7 +18,7 @@ class RustApiChatService {
   // Dirección base de tu API en Rust
 
 
-  static const String baseUrl = 'https://javier.tail1d9055.ts.net/';
+  static const String baseUrl = 'https://javier.tail33d395.ts.net';
 
 
   /// ✅ Buscar productos según el mensaje del usuario
