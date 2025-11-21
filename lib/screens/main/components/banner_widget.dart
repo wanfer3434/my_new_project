@@ -35,17 +35,22 @@ class _BannerPageState extends State<BannerPage> {
 
   // Función para obtener banners de la API
   Future<List<String>> fetchBanners() async {
-    final response = await http.get(
-      Uri.parse('https://javier.tail33d395.ts.net/banners'),
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('https://javier.tail33d395.ts.net/banners'),
+      );
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      return data.map((banner) =>
-      'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}'
-      ).toList();
-    } else {
-      throw Exception('Error al cargar los banners');
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        return data
+            .map((banner) =>
+        'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}')
+            .toList();
+      } else {
+        return []; // Vacío para activar fallback
+      }
+    } catch (e) {
+      return []; // Error → fallback
     }
   }
 
@@ -69,6 +74,12 @@ class _BannerPageState extends State<BannerPage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget fallbackImage = Image.asset(
+      'assets/samsun_roja_16mp.jpg',
+      fit: BoxFit.cover,
+      width: double.infinity,
+    );
+
     return FutureBuilder<List<String>>(
       future: banners,
       builder: (context, snapshot) {
@@ -76,12 +87,11 @@ class _BannerPageState extends State<BannerPage> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (snapshot.hasError) {
-          return const Center(child: Text('Error al cargar los banners'));
-        }
-
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No hay banners disponibles'));
+        // Si hay error o no hay data → mostrar imagen por defecto
+        if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data!.isEmpty) {
+          return Center(child: fallbackImage);
         }
 
         // Comenzar autoplay después de cargar los banners
@@ -118,52 +128,46 @@ class _BannerPageState extends State<BannerPage> {
                 });
               },
               itemBuilder: (context, index) {
+                final imageUrl = snapshot.data![index];
+
                 return GestureDetector(
-                  onTap: () {
-                    // Acción al tocar el banner (opcional)
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    // 🔴 Se quitó el height fijo aquí
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-                      child: Image.network(
-                        snapshot.data![index],
-                        fit: BoxFit.contain,  // ✅ cambio aquí
-                        width: double.infinity,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                  (loadingProgress.expectedTotalBytes ?? 1)
-                                  : null,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.broken_image, size: 50, color: Colors.red),
-                              SizedBox(height: 10),
-                              Text('Error al cargar la imagen', style: TextStyle(color: Colors.black)),
-                            ],
+                  onTap: () {},
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(20)),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                                : null,
                           ),
-                        ),
-                      ),
+                        );
+                      },
+
+                      // 🔥 Fallback si la imagen remota falla
+                      errorBuilder: (context, error, stackTrace) {
+                        return fallbackImage;
+                      },
                     ),
                   ),
                 );
               },
             ),
-            // Botón flotante separado
+
+            // Botón flotante para subir banners
             BannerUpload.uploadButton(context, () {
               setState(() {
                 banners = fetchBanners();
               });
             }),
+
             // Botones de notificación y chat
             Positioned(
               top: 10,
@@ -171,15 +175,16 @@ class _BannerPageState extends State<BannerPage> {
               child: Column(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.notifications, color: Colors.deepPurple),
-                    iconSize: 40, // 🔹 Tamaño más grande
+                    icon: const Icon(Icons.notifications,
+                        color: Colors.deepPurple),
+                    iconSize: 40,
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => NotificationsPage()),
                       );
                     },
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(height: 10),
                   IconButton(
                     icon: Image.asset(
                       'assets/icons/icono_mensaje.png',

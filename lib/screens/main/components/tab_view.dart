@@ -17,7 +17,7 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   late AnimationController animationController;
 
   final List<String> categoryNames = [
-    'Plantas & Diagnóstico',
+    'Edición Limitada',
     'Celulares',
     'Protectores Celular',
     'Audífonos',

@@ -9,10 +9,12 @@ import 'package:my_new_project/screens/shop/check_out_page.dart';
 import '../../app_properties.dart';
 import '../../custom_background.dart';
 import '../../models/local_product_list.dart';
+import '../ProfilePage/about_page.dart';
+import '../ProfilePage/contact_page.dart';
+import '../ProfilePage/privacy_page.dart';
 import '../category/category_list_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'components/AnotherPage.dart';
 import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
@@ -58,27 +60,43 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   }
 
   Widget _buildTimelineSelector() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: timelines.map((timeline) {
-        return Flexible(
-          child: InkWell(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: timelines.map((timeline) {
+          final bool selected = timeline == selectedTimeline;
+
+          return GestureDetector(
             onTap: () {
               setState(() {
                 selectedTimeline = timeline;
               });
             },
-            child: Text(
-              timeline,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: timeline == selectedTimeline ? 20 : 14,
-                color: Colors.grey,
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 250),
+              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              decoration: BoxDecoration(
+                color: selected ? Colors.black87 : Colors.transparent,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: selected ? Colors.black : Colors.grey.shade400,
+                  width: 1.3,
+                ),
+              ),
+              child: Text(
+                timeline,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: selected ? 16 : 14,
+                  color: selected ? Colors.white : Colors.grey.shade700,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -93,10 +111,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         Tab(text: 'Audifonos'),
         Tab(text: 'Camaras'),
       ],
-      labelStyle: TextStyle(fontSize: 16.0),
+      labelStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       unselectedLabelStyle: TextStyle(fontSize: 14.0),
-      labelColor: darkGrey,
-      unselectedLabelColor: Color.fromRGBO(0, 0, 0, 0.5),
+      labelColor: Colors.black,
+      unselectedLabelColor: Colors.grey.shade700,
+      indicatorColor: Colors.black,
       isScrollable: true,
     );
 
@@ -104,47 +123,113 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
       create: (_) => CategoryProvider(),
       child: Scaffold(
         bottomNavigationBar: CustomBottomBar(controller: bottomTabController),
+
+        // WhatsApp button
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            const url = 'https://wa.me/573124893931?text=Hola%20quiero%20más%20info%20de%20tu%20tienda%20tecnológica';
+            const url = 'https://wa.me/573209120172?text=Hola%20quiero%20más%20info%20de%20tu%20tienda%20tecnológica';
             if (await canLaunchUrl(Uri.parse(url))) {
               await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-            } else {
-              throw 'No se pudo abrir WhatsApp';
             }
           },
           backgroundColor: Colors.green,
           child: FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
         ),
-        body: CustomPaint(
-          painter: MainBackground(),
-          child: TabBarView(
-            controller: bottomTabController,
-            children: <Widget>[
-              SafeArea(
-                child: NestedScrollView(
-                  headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 230,
-                          child: BannerPage(), // Tu banner actual
-                        ),
-                      ),
-                      SliverToBoxAdapter(child: BrandSlider()),
-                      SliverToBoxAdapter(child: _buildTimelineSelector()),
-                      SliverToBoxAdapter(child: _buildProductList()),
-                      SliverToBoxAdapter(child: tabBar),
-                    ];
-                  },
-                  body: TabView(tabController: tabController),
-                ),
+
+        body: Stack(
+          children: [
+            CustomPaint(
+              painter: MainBackground(),
+              child: TabBarView(
+                controller: bottomTabController,
+                children: <Widget>[
+                  SafeArea(
+                    child: NestedScrollView(
+                      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                        return <Widget>[
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: 230,
+                              child: BannerPage(),
+                            ),
+                          ),
+                          SliverToBoxAdapter(child: BrandSlider()),
+                          SliverToBoxAdapter(child: _buildTimelineSelector()),
+                          SliverToBoxAdapter(child: _buildProductList()),
+                          SliverToBoxAdapter(child: tabBar),
+                        ];
+                      },
+                      body: TabView(tabController: tabController),
+                    ),
+                  ),
+                  CategoryListPage(),
+                  CheckOutPage(),
+                  ProfilePage(),
+                ],
               ),
-              CategoryListPage(),
-              CheckOutPage(),
-              ProfilePage(),
-            ],
-          ),
+            ),
+
+            // BOTÓN LEGAL
+            Positioned(
+              left: 20,
+              bottom: 80,
+              child: FloatingActionButton(
+                heroTag: "legalBtn",
+                mini: true,
+                backgroundColor: Colors.black87,
+                child: Icon(Icons.info, color: Colors.white),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (_) => Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: 10),
+                          Container(
+                            width: 40,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.privacy_tip, color: Colors.black),
+                            title: Text("Política de Privacidad"),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => PrivacyPage()));
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.person, color: Colors.black),
+                            title: Text("Quiénes Somos"),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => AboutPage()));
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.contact_mail, color: Colors.black),
+                            title: Text("Contacto"),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => ContactPage()));
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

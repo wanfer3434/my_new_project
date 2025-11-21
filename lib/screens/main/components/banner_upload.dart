@@ -13,7 +13,7 @@ class BannerUpload {
     if (result != null && result.files.isNotEmpty) {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://192.168.0.17:3000/upload_banner'), // Cambiar a tu endpoint
+        Uri.parse('https://javier.tail33d395.ts.net/upload_banner'), // Cambiar a tu endpoint
       );
 
       for (var file in result.files) {
