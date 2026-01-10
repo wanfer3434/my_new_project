@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:my_new_project/models/product.dart';
 import 'package:my_new_project/screens/profile_page.dart';
 import 'package:my_new_project/screens/shop/check_out_page.dart';
-
 import '../../app_properties.dart';
 import '../../custom_background.dart';
 import '../../models/local_product_list.dart';
@@ -13,14 +13,12 @@ import '../ProfilePage/about_page.dart';
 import '../ProfilePage/contact_page.dart';
 import '../ProfilePage/privacy_page.dart';
 import '../category/category_list_page.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
 import 'components/product_list.dart';
 import 'components/tab_view.dart';
 import 'components/brand_slider.dart';
-
 import 'package:my_new_project/screens/category/category_provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -40,10 +38,19 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   ];
   String selectedTimeline = 'Destacado Semana';
 
+  // Tabs visibles
+  final List<String> tabNames = [
+    'Promo',
+    'Celulares',
+    'Protectores Celular',
+    'Audífonos',
+    'Cámaras',
+  ];
+
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 5, vsync: this);
+    tabController = TabController(length: tabNames.length, vsync: this);
     bottomTabController = TabController(length: 4, vsync: this);
     products = LocalProductService().getProducts();
   }
@@ -75,7 +82,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             },
             child: AnimatedContainer(
               duration: Duration(milliseconds: 250),
-              padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              padding: EdgeInsets.symmetric(vertical: 1, horizontal: 2),
               decoration: BoxDecoration(
                 color: selected ? Colors.black87 : Colors.transparent,
                 borderRadius: BorderRadius.circular(15),
@@ -102,23 +109,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget tabBar = TabBar(
-      controller: tabController,
-      tabs: [
-        Tab(text: 'Plantas & Diagnóstico'),
-        Tab(text: 'Celulares'),
-        Tab(text: 'Protectores Celular'),
-        Tab(text: 'Audifonos'),
-        Tab(text: 'Camaras'),
-      ],
-      labelStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-      unselectedLabelStyle: TextStyle(fontSize: 14.0),
-      labelColor: Colors.black,
-      unselectedLabelColor: Colors.grey.shade700,
-      indicatorColor: Colors.black,
-      isScrollable: true,
-    );
-
     return ChangeNotifierProvider(
       create: (_) => CategoryProvider(),
       child: Scaffold(
@@ -127,9 +117,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         // WhatsApp button
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            const url = 'https://wa.me/573209120172?text=Hola%20quiero%20más%20info%20de%20tu%20tienda%20tecnológica';
+            const url =
+                'https://wa.me/573209120172?text=Hola%20quiero%20más%20info%20de%20tu%20tienda%20tecnológica';
             if (await canLaunchUrl(Uri.parse(url))) {
-              await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              await launchUrl(Uri.parse(url),
+                  mode: LaunchMode.externalApplication);
             }
           },
           backgroundColor: Colors.green,
@@ -145,18 +137,31 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 children: <Widget>[
                   SafeArea(
                     child: NestedScrollView(
-                      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                      headerSliverBuilder:
+                          (BuildContext context, bool innerBoxIsScrolled) {
                         return <Widget>[
                           SliverToBoxAdapter(
                             child: SizedBox(
-                              height: 230,
+                              height: 350,
                               child: BannerPage(),
                             ),
                           ),
                           SliverToBoxAdapter(child: BrandSlider()),
                           SliverToBoxAdapter(child: _buildTimelineSelector()),
                           SliverToBoxAdapter(child: _buildProductList()),
-                          SliverToBoxAdapter(child: tabBar),
+                          SliverToBoxAdapter(
+                            child: TabBar(
+                              controller: tabController,
+                              tabs: tabNames.map((name) => Tab(text: name)).toList(),
+                              labelStyle: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                              unselectedLabelStyle: TextStyle(fontSize: 14.0),
+                              labelColor: Colors.black,
+                              unselectedLabelColor: Colors.grey.shade700,
+                              indicatorColor: Colors.black,
+                              isScrollable: true,
+                            ),
+                          ),
                         ];
                       },
                       body: TabView(tabController: tabController),
@@ -182,7 +187,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20)),
                     ),
                     builder: (_) => Padding(
                       padding: const EdgeInsets.only(bottom: 20),
@@ -203,7 +209,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                             title: Text("Política de Privacidad"),
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => PrivacyPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => PrivacyPage()));
                             },
                           ),
                           ListTile(
@@ -211,7 +220,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                             title: Text("Quiénes Somos"),
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => AboutPage()));
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => AboutPage()));
                             },
                           ),
                           ListTile(
@@ -219,7 +229,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                             title: Text("Contacto"),
                             onTap: () {
                               Navigator.pop(context);
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => ContactPage()));
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => ContactPage()));
                             },
                           ),
                         ],

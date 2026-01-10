@@ -13,8 +13,8 @@ class ProductList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Ajuste de dimensiones más estándar
-    double cardHeight = MediaQuery.of(context).size.height * 0.3; // 30% del alto de la pantalla
-    double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% del ancho de la pantalla
+    double cardHeight = MediaQuery.of(context).size.height * 0.5; // 30% del alto de la pantalla
+    double cardWidth = MediaQuery.of(context).size.width * 0.2; // 40% del ancho de la pantalla
     double paginationSize = 8.0; // Tamaño más pequeño para los puntos de paginación
 
     return SizedBox(

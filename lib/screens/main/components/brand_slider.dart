@@ -62,7 +62,7 @@ class _BrandSliderState extends State<BrandSlider> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 60, // Altura del slider
+      height: 45, // Altura del slider
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,

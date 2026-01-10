@@ -23,7 +23,7 @@ class CategoryCard extends StatelessWidget {
     required this.rating,
     required this.whatsappUrl,
     required Category category,
-    this.imageHeight = 280.0, // Valor por defecto para la altura de la imagen
+    this.imageHeight = 350.0, // Valor por defecto para la altura de la imagen
   });
 
   Widget _buildAnimation(BuildContext context, Widget? child) {
@@ -43,6 +43,7 @@ class CategoryCard extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(12)), // Redondeo mejorado
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Ajustar la altura de la imagen aquí
               CachedNetworkImage(

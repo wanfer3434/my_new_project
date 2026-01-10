@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:my_new_project/models/product.dart';
 import 'package:my_new_project/screens/product/product_page.dart';
 
@@ -9,156 +11,185 @@ class ProductCard extends StatefulWidget {
   final double height;
   final double width;
 
-  ProductCard({
+  const ProductCard({
+    super.key,
     required this.product,
     required this.height,
     required this.width,
   });
 
   @override
-  _ProductCardState createState() => _ProductCardState();
+  State<ProductCard> createState() => _ProductCardState();
 }
 
 class _ProductCardState extends State<ProductCard> {
-  double _currentRating = 0; // Calificación actual seleccionada por el usuario
-  int _currentImageIndex = 0; // Índice para manejar la imagen actual
-  double _averageRating = 4.5; // Simulación de promedio de calificación inicial
-  int _ratingCount = 20; // Simulación del número de opiniones
-  Timer? _imageTimer; // Timer para cambiar las imágenes automáticamente
+  late final PageController _pageController;
+  Timer? _autoSwipeTimer;
+  int _currentPage = 0;
+
+  double _currentRating = 0;
+  double _averageRating = 4.5;
+  int _ratingCount = 20;
 
   @override
   void initState() {
     super.initState();
-    _startImageTimer();
+    _pageController = PageController();
+
+    // 🔄 AUTOPLAY (solo si hay más de 1 imagen)
+    if (widget.product.imageUrls.length > 1) {
+      _autoSwipeTimer = Timer.periodic(
+        const Duration(seconds: 3),
+            (_) {
+          if (!mounted) return;
+
+          _currentPage =
+              (_currentPage + 1) % widget.product.imageUrls.length;
+
+          _pageController.animateToPage(
+            _currentPage,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        },
+      );
+    }
   }
 
   @override
   void dispose() {
-    _imageTimer?.cancel(); // Detener el Timer cuando el widget se destruye
+    _autoSwipeTimer?.cancel();
+    _pageController.dispose();
     super.dispose();
   }
 
-  // Inicia el temporizador para cambiar las imágenes automáticamente
-  void _startImageTimer() {
-    _imageTimer = Timer.periodic(Duration(seconds: 2), (timer) {
-      setState(() {
-        _currentImageIndex = (_currentImageIndex + 1) % widget.product.imageUrls.length;
-      });
-    });
-  }
-
-  // Función para simular el guardado de una calificación localmente
   void _saveRating(double rating) {
+    final total = _averageRating * _ratingCount;
     setState(() {
-      double currentTotalRating = _averageRating * _ratingCount;
-      _ratingCount += 1;
-      _averageRating = (currentTotalRating + rating) / _ratingCount;
+      _ratingCount++;
+      _averageRating = (total + rating) / _ratingCount;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      borderRadius: BorderRadius.circular(12),
       onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => ProductPage(product: widget.product)),
-      ),
-      child: Container(
-        height: widget.height,
-        width: widget.width - 28,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          color: Colors.white30,
+        MaterialPageRoute(
+          builder: (_) => ProductPage(product: widget.product),
         ),
-        child: SingleChildScrollView(
+      ),
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(9),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // Imagen del producto con cambio al tocar
-            GestureDetector(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Container(
-                      padding: EdgeInsets.all(16.0),
-                      width: MediaQuery.of(context).size.width * 1.5,
-                      height: MediaQuery.of(context).size.height * 0.30,
-                      child: Image.network(
-                        widget.product.imageUrls[_currentImageIndex], // Mostrar la imagen actual
+          children: [
+
+            // 🖼️ IMÁGENES CON SWIPE + AUTOPLAY
+            Stack(
+              children: [
+                SizedBox(
+                  height: widget.height * 0.65,
+                  width: double.infinity,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (i) => _currentPage = i,
+                    itemCount: widget.product.imageUrls.length,
+                    itemBuilder: (_, index) {
+                      return CachedNetworkImage(
+                        imageUrl: widget.product.imageUrls[index],
                         fit: BoxFit.cover,
-                        height: constraints.maxWidth < 600 ? 190 : 300,
+                        placeholder: (_, __) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (_, __, ___) =>
+                        const Icon(Icons.broken_image),
+                      );
+                    },
+                  ),
+                ),
+
+                // 🟢 INDICADOR
+                if (widget.product.imageUrls.length > 1)
+                  Positioned(
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: SmoothPageIndicator(
+                        controller: _pageController,
+                        count: widget.product.imageUrls.length,
+                        effect: const WormEffect(
+                          dotHeight: 6,
+                          dotWidth: 6,
+                          dotColor: Colors.white54,
+                          activeDotColor: Colors.white,
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
+              ],
             ),
-            // Información del producto
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 6.0),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                ),
-              ),
+
+            // 📦 INFO
+            Padding(
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // Nombre del producto
+                children: [
                   Text(
                     widget.product.name,
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.black,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.product.description,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\$${widget.product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 1.9),
-                  // Descripción del producto
-                  Text(
-                    widget.product.description,
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 4.0),
-                  // Precio del producto
-                  Text(
-                    '\$${widget.product.price.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 4.0),
-                  // Calificación con estrellas
+                  const SizedBox(height: 2),
+
+                  // ⭐ RATING
                   RatingBar.builder(
                     initialRating: _currentRating,
                     minRating: 1,
-                    direction: Axis.horizontal,
                     allowHalfRating: true,
                     itemCount: 5,
-                    itemSize: 20.0, // Tamaño de las estrellas
-                    itemBuilder: (context, _) => Icon(
+                    itemSize: 18,
+                    itemBuilder: (_, __) => const Icon(
                       Icons.star,
                       color: Colors.amber,
                     ),
                     onRatingUpdate: (rating) {
-                      setState(() {
-                        _currentRating = rating;
-                      });
-                      _saveRating(rating); // Simular guardar la calificación
+                      _currentRating = rating;
+                      _saveRating(rating);
                     },
                   ),
-                  SizedBox(height: 3.0),
-                  // Mostrar promedio de calificación
+                  const SizedBox(height: 2),
                   Text(
-                    'Promedio: ${_averageRating.toStringAsFixed(1)} ($_ratingCount opiniones)',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.black26,
+                    'Promedio: ${_averageRating.toStringAsFixed(1)} ($_ratingCount)',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.black45,
                     ),
                   ),
                 ],
@@ -166,7 +197,6 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ],
         ),
-      ),
       ),
     );
   }

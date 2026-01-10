@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Category {
+class  Category {
   final String id;
   final String name;
   final String description;

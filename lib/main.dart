@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+/*import 'package:flutter/rendering.dart';*/
 import 'package:provider/provider.dart';
 import 'package:my_new_project/screens/splash_page.dart';
 import 'package:my_new_project/models/category.dart';
@@ -18,7 +19,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  /*debugPaintSizeEnabled = true; // 🔥 ACTÍVALO*/
   // Ejecuta la aplicación.
   runApp(MyApp());
 }

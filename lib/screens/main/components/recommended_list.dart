@@ -1,253 +1,177 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:my_new_project/app_properties.dart';
 import 'package:my_new_project/models/product.dart';
-import 'package:my_new_project/screens/product/product_page.dart';
+import 'package:my_new_project/screens/product/components/product_card.dart';
 
-class RecommendedList extends StatefulWidget {
+class RecommendedList extends StatelessWidget {
   final String category;
+  final ScrollController? controller; // Controller opcional
 
-  RecommendedList({required this.category});
+  const RecommendedList({super.key, required this.category, this.controller});
 
-  @override
-  _RecommendedListState createState() => _RecommendedListState();
-}
-
-class _RecommendedListState extends State<RecommendedList> {
-  final List<Product> allProducts = [
+  List<Product> get allProducts => [
     Product(
-      id: '1',
-      imageUrls: ['https://i.imgur.com/4mejGU4.jpg', 'https://i.imgur.com/3Lk2fcw.jpg'],
+      id: 'promo_01',
+      imageUrls: [
+        'https://i.imgur.com/4mejGU4.jpg',
+        'https://i.imgur.com/3Lk2fcw.jpg'
+      ],
       name: 'Forro con cadena',
       description: 'Diseño para Dama',
       price: 30000,
-      category: 'Plantas & Diagnóstico',
+      category: 'Edición Limitada',
     ),
     Product(
-      id: '2',
-      imageUrls: ['https://i.imgur.com/G4z0HpV.png', 'https://i.imgur.com/Xf2TEUR.png'],
+      id: 'promo_02',
+      imageUrls: [
+        'https://i.imgur.com/4mejGU4.jpg',
+        'https://i.imgur.com/3Lk2fcw.jpg'
+      ],
+      name: 'Forro con cadena',
+      description: 'Diseño para Dama',
+      price: 30000,
+      category: 'Edición Limitada',
+    ),
+    Product(
+      id: 'vidrios',
+      imageUrls: [
+        'https://i.imgur.com/G4z0HpV.png',
+        'https://i.imgur.com/1nt75XM.jpeg'
+      ],
       name: 'Vidrios para Pantalla',
       description: 'A70',
       price: 1000,
-      category: 'Celulares',
-    ),
-    Product(
-      id: '3',
-      imageUrls: ['https://i.imgur.com/zgyf3ow.jpg', 'https://i.imgur.com/sOcdUi7.jpg','https://imgur.com/LApJ975','https://i.imgur.com/QKEJ2Cz.jpg'],
-      name: 'Vidrios para Pantallas curvos',
-      description: 'Digital Camera',
-      price: 30000,
       category: 'Protectores Celular',
     ),
     Product(
-      id: '4',
-      imageUrls: ['https://i.imgur.com/5zqRhBS.png', 'https://i.imgur.com/pJ31feH.jpg','https://i.imgur.com/c5QE6kL.jpg','https://i.imgur.com/6MW5IPT.jpg'],
-      name: 'Botones',
-      description: 'Astronautas',
-      price: 2000,
-      category: 'Audífonos',
+      id: 'vidrios-linea',
+      imageUrls: [
+        'https://i.imgur.com/GKAMvDV.jpeg',
+        'https://i.imgur.com/FJPEqJ2.jpeg'
+      ],
+      name: 'Vidrios para Pantalla',
+      description: 'A70',
+      price: 1000,
+      category: 'Protectores Celular',
     ),
     Product(
-      id: '5',
+      id: 'vidrios-curvo-antiespia',
       imageUrls: [
-        'https://i.imgur.com/GB1hy1B.jpg  ', 'https://i.imgur.com/MtMle6w.jpg'
+        'https://i.imgur.com/1nt75XM.jpeg',
+        'https://i.imgur.com/BRFr1f5.jpeg'
       ],
-      name: 'Cámaras en bun estado',
+      name: 'Vidrios para Pantalla',
+      description: 'A70',
+      price: 1000,
+      category: 'Protectores Celular',
+    ),
+    Product(
+      id: 'cam_01',
+      imageUrls: [
+        'https://i.imgur.com/GB1hy1B.jpg',
+        'https://i.imgur.com/MtMle6w.jpg'
+      ],
+      name: 'Cámara Vintage',
       description: 'Digital Camera',
-      price: 30000,
+      price: 300000,
       category: 'Camaras',
     ),
     Product(
-      id: '6',
+      id: 'cam_02',
       imageUrls: [
-        'https://i.imgur.com/EKmFTAk.jpg', 'https://i.imgur.com/U9KP4c5.jpg','https://i.imgur.com/7hjCxbU.jpg'
+        'https://i.imgur.com/EKmFTAk.jpg',
+        'https://i.imgur.com/U9KP4c5.jpg',
       ],
-      name: 'Cámaras Digitales',
-      description: 'Digital Camera',
-      price: 30000,
+      name: 'Cámara Vintage',
+      description: 'Colección',
+      price: 320000,
       category: 'Camaras',
     ),
     Product(
-      id: '7',
+      id: 'cam_03',
       imageUrls: [
-        'https://i.imgur.com/IkyYPoB.jpg', 'https://i.imgur.com/xdA1ci9.jpg','https://i.imgur.com/lfpdl9G.jpg'
+        'https://i.imgur.com/IkyYPoB.jpg',
+        'https://i.imgur.com/xdA1ci9.jpg',
       ],
-      name: 'Cámaras',
-      description: 'Digital Camera',
-      price: 30000,
+      name: 'Cámara Vintage',
+      description: 'Clásica',
+      price: 350000,
       category: 'Camaras',
-    ),
-    Product(
-      id: '8',
-      imageUrls: [
-        'https://i.imgur.com/2q28rLO.jpg', 'https://i.imgur.com/57cTnWG.jpg','https://i.imgur.com/zRyg7KF.jpg'
-      ],
-      name: 'Cámaras Digitales',
-      description: 'Digital Camera',
-      price: 30000,
-      category: 'Camaras de Pila Litio',
     ),
   ];
 
-  Map<String, double> _currentRatings = {};
-  Map<String, int> _ratingCounts = {};
-  late List<int> _currentImageIndices;
-  Timer? _imageChangeTimer;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _currentImageIndices = List.generate(allProducts.length, (_) => 0);
-    for (var product in allProducts) {
-      _currentRatings[product.id] = 4.5;
-      _ratingCounts[product.id] = 200;
-    }
-
-    _imageChangeTimer = Timer.periodic(Duration(seconds: 3), (timer) {
-      if (mounted) {
-        setState(() {
-          for (int i = 0; i < allProducts.length; i++) {
-            if (allProducts[i].imageUrls.isNotEmpty) {
-              _currentImageIndices[i] =
-                  (_currentImageIndices[i] + 1) % allProducts[i].imageUrls.length;
-            }
-          }
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _imageChangeTimer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<Product> filteredProducts = allProducts
-        .where((p) => p.category.toLowerCase().trim() == widget.category.toLowerCase().trim())
+    final filteredProducts = allProducts
+        .where((p) =>
+        p.category.toLowerCase().contains(category.toLowerCase()))
         .toList();
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              height: 40,
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(left: 16.0, right: 8.0),
-                    width: 4,
-                    color: mediumYellow,
-                  ),
-                  Text(
-                    'Recomendado',
-                    style: TextStyle(
-                      color: darkGrey,
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            filteredProducts.isEmpty
-                ? Center(
-              child: Text(
-                'No hay productos en esta categoría',
-                style: TextStyle(fontSize: 18, color: Colors.black54),
-              ),
-            )
-                : SizedBox(
-              height: constraints.maxHeight - 50, // Ajusta la altura para evitar errores
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: MasonryGridView.count(
-                  physics: BouncingScrollPhysics(),
-                  crossAxisCount: 2,
-                  itemCount: filteredProducts.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final product = filteredProducts[index];
-                    return InkWell(
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ProductPage(product: product),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Hero(
-                            tag: product.imageUrls[0],
-                            child: Image.network(
-                              product.imageUrls[_currentImageIndices[index]],
-                              fit: BoxFit.cover,
-                              height: 150,
-                              width: double.infinity,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Icon(Icons.error),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  product.name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  '\$${product.price.toStringAsFixed(0)}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.0,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                RatingBar.builder(
-                                  initialRating: _currentRatings[product.id]!,
-                                  minRating: 1,
-                                  direction: Axis.horizontal,
-                                  allowHalfRating: true,
-                                  itemCount: 5,
-                                  itemSize: 20.0,
-                                  itemBuilder: (context, _) => Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                  ),
-                                  onRatingUpdate: (rating) {
-                                    setState(() {
-                                      _currentRatings[product.id] = rating;
-                                      _ratingCounts[product.id] =
-                                      (_ratingCounts[product.id]! + 1);
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+    if (filteredProducts.isEmpty) {
+      return const Center(
+        child: Text(
+          'No hay productos en esta categoría',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+
+    return CustomScrollView(
+      controller: controller,
+      slivers: [
+        // 🟡 Header
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(right: 6),
+                  width: 4,
+                  height: 24,
+                  color: mediumYellow,
                 ),
-              ),
+                const Text(
+                  'Recomendado',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ],
-        );
-      },
+          ),
+        ),
+
+        // 🟡 Grid de productos
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          sliver: SliverGrid(
+            delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                final product = filteredProducts[index];
+                return ProductCard(
+                  product: product,
+                  height: 210,
+                  width: MediaQuery.of(context).size.width,
+                );
+              },
+              childCount: filteredProducts.length,
+            ),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.65,
+            ),
+          ),
+        ),
+
+        // 🟡 Espacio inferior para no tapar con el BottomNavigationBar
+        SliverToBoxAdapter(
+          child: SizedBox(height: kBottomNavigationBarHeight),
+        ),
+      ],
     );
   }
 }

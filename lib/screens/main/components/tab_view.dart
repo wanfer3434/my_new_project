@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'category_card.dart';
-import 'recommended_list.dart';
 import 'package:my_new_project/screens/category/category_provider.dart';
+import '../../category/market_category_card.dart';
+import 'recommended_list.dart';
 
 class TabView extends StatefulWidget {
   final TabController tabController;
@@ -16,12 +16,13 @@ class TabView extends StatefulWidget {
 class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   late AnimationController animationController;
 
-  final List<String> categoryNames = [
-    'Edición Limitada',
-    'Celulares',
-    'Protectores Celular',
-    'Audífonos',
-    'Camaras',
+  /// Lista de tabs y su categoría real
+  final List<Map<String, String>> tabCategories = [
+    {'tab': 'Edición Limitada', 'category': 'Edición Limitada'},
+    {'tab': 'Celulares', 'category': 'Celulares'},
+    {'tab': 'Protectores', 'category': 'Protectores Celular'},
+    {'tab': 'Audífonos', 'category': 'Audífonos'},
+    {'tab': 'Cámaras', 'category': 'Camaras'},
   ];
 
   @override
@@ -49,49 +50,56 @@ class _TabViewState extends State<TabView> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final categories = Provider.of<CategoryProvider>(context).categories;
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.75, // Definir altura fija
-      child: TabBarView(
-        controller: widget.tabController,
-        physics: BouncingScrollPhysics(),
-        children: categoryNames.map((category) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (categories.isNotEmpty)
-                SizedBox(
-                  height: 359, // Definir altura de la lista horizontal
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final categoryData = categories[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: CategoryCard(
-                          controller: animationController,
-                          begin: categoryData.begin,
-                          end: categoryData.end,
-                          categoryName: categoryData.name ?? 'Sin Nombre',
-                          imageUrl: categoryData.imageUrls.isNotEmpty
-                              ? categoryData.imageUrls[0]
-                              : '',
-                          category: categoryData,
-                          rating: categoryData.averageRating ?? 0.0,
-                          whatsappUrl: categoryData.whatsappUrl ?? '',
-                        ),
-                      );
-                    },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return TabBarView(
+          controller: widget.tabController,
+          physics: const BouncingScrollPhysics(),
+          children: tabCategories.map((tabData) {
+            final categoryName = tabData['category']!;
+            final filteredCategories = categories
+                .where((cat) =>
+                cat.name.toLowerCase().contains(categoryName.toLowerCase()))
+                .toList();
+            final listToShow =
+            filteredCategories.isNotEmpty ? filteredCategories : categories;
+
+            return CustomScrollView(
+              slivers: [
+                // 🔹 Carrusel horizontal de categorías
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 290,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        children: listToShow.map((category) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: SizedBox(
+                              width: 190,
+                              child: MarketCategoryCard(category: category),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
                 ),
-              SizedBox(height:8),
-              Expanded( // Solución al error de altura infinita
-                child: RecommendedList(category: category),
-              ),
-            ],
-          );
-        }).toList(),
-      ),
+
+                // 🔹 Lista recomendada de productos
+                SliverFillRemaining(
+                  hasScrollBody: true,
+                  child: SafeArea(
+                    child: RecommendedList(category: categoryName),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
