@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../models/recomendacion_stock_response.dart';
 import '../product/product_response.dart';
 
 class User {
@@ -88,4 +89,28 @@ Future<String> getChatbotResponse(String mensajeUsuario) async {
       ),
     );
   }
+
+  /// ✅ Obtener recomendaciones de stock desde la API
+  Future<List<RecomendacionStockResponse>> getRecomendacionStock() async {
+    try {
+      final uri = Uri.parse('$baseUrl/recomendacion-stock');
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+
+        return data
+            .map((e) => RecomendacionStockResponse.fromJson(e))
+            .toList();
+      } else {
+        print('❌ Error servidor recomendacion-stock: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Excepción en getRecomendacionStock: $e');
+    }
+
+    return [];
+  }
 }
+

@@ -22,10 +22,23 @@ class RecommendedList extends StatelessWidget {
       category: 'Edición Limitada',
     ),
     Product(
+      id: 'promo_03',
+      imageUrls: [
+        'https://i.imgur.com/biUwWpS.jpeg',
+        'https://i.imgur.com/monFPQn.jpeg',
+        'https://i.imgur.com/hTqNsYQ.jpeg'
+      ],
+      name: 'Cargadores',
+      description: 'Color Negro, Blanco',
+      price: 30000,
+      category: 'Edición Limitada',
+    ),
+    Product(
       id: 'promo_02',
       imageUrls: [
-        'https://i.imgur.com/4mejGU4.jpg',
-        'https://i.imgur.com/3Lk2fcw.jpg'
+        'https://i.imgur.com/u9SmOhc.jpeg',
+        'https://i.imgur.com/3Lk2fcw.jpg',
+        'https://i.imgur.com/cFxPKBr.jpeg'
       ],
       name: 'Forro con cadena',
       description: 'Diseño para Dama',
@@ -55,9 +68,31 @@ class RecommendedList extends StatelessWidget {
       category: 'Protectores Celular',
     ),
     Product(
+      id: 'vidrios-2026',
+      imageUrls: [
+        'https://i.imgur.com/DmXDgiK.jpeg',
+        'https://i.imgur.com/qMM7EgX.jpeg'
+      ],
+      name: 'Vidrios para Pantalla',
+      description: 'A70',
+      price: 1000,
+      category: 'Protectores Celular',
+    ),
+    Product(
       id: 'vidrios-curvo-antiespia',
       imageUrls: [
         'https://i.imgur.com/1nt75XM.jpeg',
+        'https://i.imgur.com/BRFr1f5.jpeg'
+      ],
+      name: 'Vidrios para Pantalla',
+      description: 'A70',
+      price: 1000,
+      category: 'Protectores Celular',
+    ),
+    Product(
+      id: 'vidrios-curv',
+      imageUrls: [
+        'https://i.imgur.com/n2Zlcg8.jpeg',
         'https://i.imgur.com/BRFr1f5.jpeg'
       ],
       name: 'Vidrios para Pantalla',
@@ -97,6 +132,51 @@ class RecommendedList extends StatelessWidget {
       description: 'Clásica',
       price: 350000,
       category: 'Camaras',
+    ),
+    Product(
+      id: 'edi-limi-360',
+      imageUrls: [
+        'https://i.imgur.com/sjreUNs.jpeg',
+        'https://i.imgur.com/xdA1ci9.jpg',
+      ],
+      name: 'Cámara Vintage',
+      description: 'Clásica',
+      price: 350000,
+      category: 'Edición Limitada',
+    ),
+    Product(
+      id: 'edi-limi-360',
+      imageUrls: [
+        'https://i.imgur.com/sjreUNs.jpeg',
+        'https://i.imgur.com/xdA1ci9.jpg',
+        'https://i.imgur.com/eBP6TxJ.jpeg'
+      ],
+      name: 'Cámara Vintage',
+      description: 'Clásica',
+      price: 350000,
+      category: 'Edición Limitada',
+    ),
+    Product(
+      id: 'audi',
+      imageUrls: [
+        'https://i.imgur.com/x3uujOO.jpeg',
+        'https://i.imgur.com/xdA1ci9.jpg',
+      ],
+      name: 'audifonos',
+      description: 'Clásica',
+      price: 350000,
+      category: 'Audífonos',
+    ),
+    Product(
+      id: 'Earpods',
+      imageUrls: [
+        'https://i.imgur.com/oH3S3Qj.jpeg',
+        'https://i.imgur.com/ScEmsNV.jpeg',
+      ],
+      name: 'Earpods Unicolor',
+      description: 'Clásica',
+      price: 350000,
+      category: 'Audífonos',
     ),
   ];
 
