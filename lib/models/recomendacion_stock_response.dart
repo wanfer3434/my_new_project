@@ -11,9 +11,9 @@ class RecomendacionStockResponse {
 
   factory RecomendacionStockResponse.fromJson(Map<String, dynamic> json) {
     return RecomendacionStockResponse(
-      producto: json['producto'],
-      stock: json['stock'],
-      vendidos7Dias: json['vendidos_7_dias'],
+      producto: json['referencia'] ?? 'Sin nombre', // antes json['producto']
+      stock: json['cantidad'] ?? 0,                 // antes json['stock']
+      vendidos7Dias: 0,                            // si no viene del servidor, puedes inicializar 0
     );
   }
 }

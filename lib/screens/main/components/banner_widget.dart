@@ -162,12 +162,12 @@ class _BannerPageState extends State<BannerPage> {
             ),
 
             // Botón flotante para subir banners
-            BannerUpload.uploadButton(context, () {
+           /* BannerUpload.uploadButton(context, () {
               setState(() {
                 banners = fetchBanners();
               });
             }),
-
+*/
             // Botones de notificación y chat
             Positioned(
               top: 10,

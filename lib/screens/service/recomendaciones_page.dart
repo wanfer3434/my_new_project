@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:my_new_project/screens/service/rust_api_chat_service.dart'; // Tu clase de API
+import 'package:my_new_project/screens/service/rust_api_chat_service.dart';
 import 'package:my_new_project/models/recomendacion_stock_response.dart';
 
 class RecomendacionesPage extends StatefulWidget {
-  const RecomendacionesPage({super.key});
+  final String ref; // 👈 recibe referencia del producto
+  const RecomendacionesPage({super.key, required this.ref});
 
   @override
   State<RecomendacionesPage> createState() => _RecomendacionesPageState();
@@ -17,11 +18,12 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
   @override
   void initState() {
     super.initState();
-    cargarRecomendaciones(); // 👈 AQUÍ se llama
+    cargarRecomendaciones();
   }
 
   Future<void> cargarRecomendaciones() async {
-    final data = await api.getRecomendacionStock();
+    // 🔑 usa la ref que viene desde el constructor
+    final data = await api.getRecomendacionStock(widget.ref);
 
     setState(() {
       recomendaciones = data;
@@ -43,8 +45,8 @@ class _RecomendacionesPageState extends State<RecomendacionesPage> {
           return ListTile(
             leading: const Icon(Icons.trending_up, color: Colors.green),
             title: Text(r.producto),
-            subtitle: Text(
-                'Vendidos últimos 7 días: ${r.vendidos7Dias}'),
+            subtitle:
+            Text('Vendidos últimos 7 días: ${r.vendidos7Dias}'),
             trailing: Text(
               'Stock: ${r.stock}',
               style: TextStyle(

@@ -15,6 +15,7 @@ import '../ProfilePage/contact_page.dart';
 import '../ProfilePage/privacy_page.dart';
 import '../category/category_list_page.dart';
 
+import '../service/recomendaciones_page.dart';
 import '../service/rust_api_chat_service.dart';
 import 'components/banner_widget.dart';
 import 'components/custom_bottom_bar.dart';
@@ -48,7 +49,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     'Audífonos',
     'Cámaras',
   ];
-  List<RecomendacionStockResponse> recomendaciones = [];
 
   @override
   void initState() {
@@ -56,55 +56,13 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
     tabController = TabController(length: tabNames.length, vsync: this);
     bottomTabController = TabController(length: 4, vsync: this);
     products = LocalProductService().getProducts();
-    _cargarRecomendaciones();
   }
-  Future<void> _cargarRecomendaciones() async {
-    final api = RustApiChatService();
-    final result = await api.getRecomendacionStock();
 
-    setState(() {
-      recomendaciones = result;
-    });
-
-    // Solo para debug en consola
-    for (var r in recomendaciones) {
-      print('📦 ${r.producto} | Vendidos: ${r.vendidos7Dias} | Stock: ${r.stock}');
-    }
-  }
   @override
   void dispose() {
     tabController.dispose();
     bottomTabController.dispose();
     super.dispose();
-  }
-
-  Widget _buildRecomendaciones() {
-    if (recomendaciones.isEmpty) {
-      return SizedBox(); // nada si no hay
-    }
-
-    return Container(
-      padding: EdgeInsets.all(10),
-      color: Colors.yellow.shade50,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Productos recomendados para surtir:',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          ...recomendaciones.map((r) => ListTile(
-            leading: Icon(Icons.inventory, color: Colors.red),
-            title: Text(r.producto),
-            subtitle:
-            Text('Vendidos 7 días: ${r.vendidos7Dias} | Stock: ${r.stock}'),
-          )),
-        ],
-      ),
-    );
   }
 
   Widget _buildProductList() {
@@ -194,7 +152,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                           SliverToBoxAdapter(child: BrandSlider()),
                           SliverToBoxAdapter(child: _buildTimelineSelector()),
                           SliverToBoxAdapter(child: _buildProductList()),
-                          SliverToBoxAdapter(child: _buildRecomendaciones()), // ✅ Aquí van las recomendaciones
                           SliverToBoxAdapter(
                             child: TabBar(
                               controller: tabController,
@@ -219,7 +176,25 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                 ],
               ),
             ),
+// BOTÓN RECOMENDACIONES
+            Positioned(
+              right: 20,
+              bottom: 150, // arriba del WhatsApp
+              child: FloatingActionButton(
+                heroTag: "recomendacionesBtn",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecomendacionesPage(ref: "Olympus Stylus SZ-16"),
+                    ),
+                  );
+                },
+                child: Icon(Icons.inventory),
+                backgroundColor: Colors.orange,
+              ),
 
+            ),
             // BOTÓN LEGAL
             Positioned(
               left: 20,

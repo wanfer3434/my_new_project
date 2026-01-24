@@ -91,18 +91,28 @@ Future<String> getChatbotResponse(String mensajeUsuario) async {
   }
 
   /// ✅ Obtener recomendaciones de stock desde la API
-  Future<List<RecomendacionStockResponse>> getRecomendacionStock() async {
-    try {
-      final uri = Uri.parse('$baseUrl/recomendacion-stock');
+  Future<List<RecomendacionStockResponse>> getRecomendacionStock(String? ref) async {
+    if (ref == null || ref.isEmpty) {
+      print('❌ Error: ref es null o vacía');
+      return [];
+    }
 
+    try {
+      final uri = Uri.parse('$baseUrl/recomendados?ref=$ref');
       final response = await http.get(uri);
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
+      print('📥 Status: ${response.statusCode}');
+      print('📥 Body: ${response.body}');
 
-        return data
-            .map((e) => RecomendacionStockResponse.fromJson(e))
-            .toList();
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+
+        if (decoded is List) {
+          return decoded.map((e) => RecomendacionStockResponse.fromJson(e)).toList();
+        } else {
+          print('❌ Error: La respuesta no es una lista');
+          return [];
+        }
       } else {
         print('❌ Error servidor recomendacion-stock: ${response.statusCode}');
       }
@@ -112,5 +122,6 @@ Future<String> getChatbotResponse(String mensajeUsuario) async {
 
     return [];
   }
+
 }
 
