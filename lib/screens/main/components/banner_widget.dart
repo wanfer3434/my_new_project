@@ -3,26 +3,19 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 
-<<<<<<< HEAD
 import '../../chat_page.dart';
 import '../../notifications_page.dart';
-=======
->>>>>>> e4e9150 (actualizacion de banner)
 import '../../../models/BannerCard.dart';
 
 class BannerPage extends StatefulWidget {
   const BannerPage({Key? key}) : super(key: key);
 
   @override
-  _BannerPageState createState() => _BannerPageState();
+  State<BannerPage> createState() => _BannerPageState();
 }
 
 class _BannerPageState extends State<BannerPage> {
-<<<<<<< HEAD
   late Future<List<dynamic>> banners;
-=======
-  late Future<List<dynamic>> banners; // ahora recibimos todo el objeto del banner
->>>>>>> e4e9150 (actualizacion de banner)
   final PageController _pageController = PageController();
   int _currentPage = 0;
   Timer? _timer;
@@ -47,7 +40,7 @@ class _BannerPageState extends State<BannerPage> {
       );
 
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = json.decode(response.body);
         return data;
       } else {
         return [];
@@ -58,40 +51,34 @@ class _BannerPageState extends State<BannerPage> {
   }
 
   void startAutoPlay(List<dynamic> bannerList) {
-<<<<<<< HEAD
     if (bannerList.isEmpty) return;
-=======
->>>>>>> e4e9150 (actualizacion de banner)
+
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
       if (_pageController.hasClients) {
         int nextPage = _currentPage + 1;
-        if (nextPage >= bannerList.length) nextPage = 0;
+        if (nextPage >= bannerList.length) {
+          nextPage = 0;
+        }
+
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
         );
+
         _currentPage = nextPage;
       }
     });
   }
 
   void incrementClick(int bannerId) async {
-<<<<<<< HEAD
-=======
-    // Aquí puedes llamar a tu API Rust para actualizar clicks en SQLite
->>>>>>> e4e9150 (actualizacion de banner)
     try {
       await http.post(
         Uri.parse('https://javier.tail33d395.ts.net/banners/click/$bannerId'),
       );
     } catch (e) {
-<<<<<<< HEAD
       debugPrint('Error actualizando clicks: $e');
-=======
-      print('Error actualizando clicks: $e');
->>>>>>> e4e9150 (actualizacion de banner)
     }
   }
 
@@ -110,12 +97,13 @@ class _BannerPageState extends State<BannerPage> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(
             height: 280,
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
 
         if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-<<<<<<< HEAD
           return SizedBox(
             height: 280,
             child: Stack(
@@ -128,18 +116,13 @@ class _BannerPageState extends State<BannerPage> {
         }
 
         final bannerList = snapshot.data!;
-=======
-          return Center(child: fallbackImage);
-        }
 
->>>>>>> e4e9150 (actualizacion de banner)
         WidgetsBinding.instance.addPostFrameCallback((_) {
           startAutoPlay(bannerList);
         });
 
         return SizedBox(
           height: 280,
-<<<<<<< HEAD
           child: Stack(
             children: [
               PageView.builder(
@@ -155,7 +138,8 @@ class _BannerPageState extends State<BannerPage> {
                   final imageUrl =
                       'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}';
                   final videoUrl = banner['video_url'];
-                  final buttonText = banner['button_text'] ?? 'Ver demostración';
+                  final buttonText =
+                      banner['button_text'] ?? 'Ver demostración';
                   final clicks = banner['clicks'] ?? 0;
 
                   return BannerCard(
@@ -169,38 +153,11 @@ class _BannerPageState extends State<BannerPage> {
               ),
               _buildOverlayButtons(context),
             ],
-=======
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: snapshot.data!.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPage = index;
-              });
-            },
-            itemBuilder: (context, index) {
-              final banner = snapshot.data![index];
-              final imageUrl =
-                  'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}';
-              final videoUrl = banner['video_url'];
-              final buttonText = banner['button_text'] ?? 'Ver demostración';
-              final clicks = banner['clicks'] ?? 0;
-
-              return BannerCard(
-                imageUrl: imageUrl,
-                videoUrl: videoUrl,
-                videoButtonText: buttonText,
-                clicks: clicks,
-                onVideoClick: () => incrementClick(banner['id']),
-              );
-            },
->>>>>>> e4e9150 (actualizacion de banner)
           ),
         );
       },
     );
   }
-<<<<<<< HEAD
 
   Widget _buildOverlayButtons(BuildContext context) {
     return Positioned(
@@ -221,7 +178,9 @@ class _BannerPageState extends State<BannerPage> {
               iconSize: 32,
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const NotificationsPage()),
+                  MaterialPageRoute(
+                    builder: (_) => NotificationsPage(),
+                  ),
                 );
               },
             ),
@@ -240,7 +199,9 @@ class _BannerPageState extends State<BannerPage> {
               ),
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ChatScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => ChatScreen(),
+                  ),
                 );
               },
             ),
@@ -250,6 +211,3 @@ class _BannerPageState extends State<BannerPage> {
     );
   }
 }
-=======
-}
->>>>>>> e4e9150 (actualizacion de banner)
