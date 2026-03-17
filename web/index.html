@@ -4,25 +4,30 @@
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Descripción de la app -->
   <meta name="description" content="Explora nuestra app de accesorios tecnológicos, cámaras, estuches y más.">
 
-  <!-- 🌐 Metaetiquetas Open Graph -->
+  <!-- 🔥 Open Graph (Facebook, WhatsApp, Messenger) -->
   <meta property="og:title" content="Tienda Tech - Accesorios y Gadgets">
   <meta property="og:description" content="Descubre los mejores estuches, protectores, cámaras y más en nuestra app.">
-  <meta property="og:image" content="https://javier.tail33d395.ts.net/og-image">
+  <meta property="og:image" content="https://tu-tienda-twin-yogo.web.app/samsun_roja_16mp.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://tu-tienda-twin-yogo.web.app">
   <meta property="og:type" content="website">
   <meta property="fb:app_id" content="2191756187968390">
 
-  <!-- 🐦 Meta etiquetas para Twitter -->
+  <!-- 🔥 Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Tienda Tech - Accesorios y Gadgets">
   <meta name="twitter:description" content="Descubre los mejores estuches, protectores, cámaras y más en nuestra app.">
-  <meta name="twitter:image" content="https://javier.tail33d395.ts.net/og-image">
+  <meta name="twitter:image" content="https://tu-tienda-twin-yogo.web.app/samsun_roja_16mp.jpg">
 
-  <!-- 📱 iOS meta tags & icons -->
+  <!-- iOS meta tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Tienda Tech">
@@ -33,20 +38,6 @@
 
   <title>Tienda Tech</title>
   <link rel="manifest" href="manifest.json">
-
-  <!-- 🕓 Script para actualizar dinámicamente la imagen del banner -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const timestamp = Date.now();
-      const newImageUrl = `https://javier.tail33d395.ts.net/get-screenshot?ts=${timestamp}`;
-
-      // Actualizar dinámicamente las metaetiquetas OG y Twitter
-      document.querySelector('meta[property="og:image"]').setAttribute("content", newImageUrl);
-      document.querySelector('meta[name="twitter:image"]').setAttribute("content", newImageUrl);
-
-      console.log("🖼 Imagen OG actualizada a:", newImageUrl);
-    });
-  </script>
 </head>
 
 <body>
