@@ -149,6 +149,8 @@ class _BannerPageState extends State<BannerPage> {
                     videoUrl: videoUrl,
                     videoButtonText: buttonText,
                     clicks: clicks,
+                    referencia: referencia,
+                    costo: costo,
                     onVideoClick: () => incrementClick(banner['id']),
                   );
                 },
