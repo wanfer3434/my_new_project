@@ -9,6 +9,8 @@ class BannerCard extends StatelessWidget {
   final int clicks;
   final double imageHeight;
   final VoidCallback? onVideoClick;
+  final String? referencia;
+  final double? costo;
 
   const BannerCard({
     Key? key,
@@ -18,7 +20,20 @@ class BannerCard extends StatelessWidget {
     this.clicks = 0,
     this.imageHeight = 250.0,
     this.onVideoClick,
+    this.referencia,
+    this.costo,
   }) : super(key: key);
+
+  Future<void> _openVideo() async {
+    if (videoUrl == null || videoUrl!.trim().isEmpty) return;
+
+    final uri = Uri.parse(videoUrl!);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      onVideoClick?.call();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +46,7 @@ class BannerCard extends StatelessWidget {
             height: imageHeight,
             width: double.infinity,
             fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
+            placeholder: (context, url) => SizedBox(
               height: imageHeight,
               child: const Center(child: CircularProgressIndicator()),
             ),
@@ -41,7 +56,50 @@ class BannerCard extends StatelessWidget {
               child: const Center(child: Icon(Icons.error)),
             ),
           ),
-          if (videoUrl != null)
+
+          Positioned(
+            left: 16,
+            top: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (referencia != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      referencia!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                if (costo != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '\$${costo!.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          if (videoUrl != null && videoUrl!.trim().isNotEmpty)
             Positioned(
               bottom: 16,
               left: 16,
@@ -60,14 +118,10 @@ class BannerCard extends StatelessWidget {
                     icon: const Icon(Icons.play_arrow),
                     label: Text(videoButtonText ?? 'Ver demostración'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white60,
+                      backgroundColor: Colors.white70,
+                      foregroundColor: Colors.black87,
                     ),
-                    onPressed: () async {
-                      if (await canLaunchUrl(Uri.parse(videoUrl!))) {
-                        await launchUrl(Uri.parse(videoUrl!));
-                        if (onVideoClick != null) onVideoClick!();
-                      }
-                    },
+                    onPressed: _openVideo,
                   ),
                 ],
               ),

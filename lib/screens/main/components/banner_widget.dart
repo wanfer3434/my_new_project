@@ -135,6 +135,8 @@ class _BannerPageState extends State<BannerPage> {
                 },
                 itemBuilder: (context, index) {
                   final banner = bannerList[index];
+                  final referencia = banner['referencia'];
+                  final costo = (banner['costo'] ?? 0).toDouble();
                   final imageUrl =
                       'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}';
                   final videoUrl = banner['video_url'];

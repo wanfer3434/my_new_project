@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
+
 import '../../models/recomendacion_stock_response.dart';
 import '../product/product_response.dart';
 
@@ -16,34 +18,54 @@ class User {
 }
 
 class RustApiChatService {
-  // Dirección base de tu API en Rust
-
-
   static const String baseUrl = 'https://javier.tail33d395.ts.net';
 
+  final http.Client _client;
 
-  /// ✅ Buscar productos según el mensaje del usuario
+  RustApiChatService({http.Client? client}) : _client = client ?? http.Client();
+
+  Map<String, String> get _jsonHeaders => {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+
+  String _normalizeQuery(String text) {
+    return text
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^\w\sáéíóúñü-]', unicode: true), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  Uri _buildUri(String path, [Map<String, dynamic>? queryParameters]) {
+    return Uri.parse(baseUrl).replace(
+      path: path,
+      queryParameters: queryParameters?.map(
+            (key, value) => MapEntry(key, value?.toString()),
+      ),
+    );
+  }
+
   Future<List<ProductResponse>> getProductMatch(String mensajeUsuario) async {
+    final query = _normalizeQuery(mensajeUsuario);
+
+    if (query.isEmpty) return [];
+
     try {
-      final query =
-          mensajeUsuario.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final uri = Uri.parse('$baseUrl/buscar?q=$query');
+      final directResults = await _searchProducts(query);
 
-      final response = await http.get(uri);
+      if (directResults.isNotEmpty) {
+        return directResults;
+      }
 
-      if (response.statusCode == 200) {
-        final List<dynamic> productos = jsonDecode(response.body);
+      final expandedQueries = _buildFallbackQueries(query);
 
-        if (productos.isNotEmpty) {
-          return productos.map<ProductResponse>((producto) {
-            return ProductResponse.fromJson(producto);
-          }).toList();
-        } else {
-          print('❌ No se encontraron productos que coincidan.');
+      for (final fallbackQuery in expandedQueries) {
+        final results = await _searchProducts(fallbackQuery);
+        if (results.isNotEmpty) {
+          return results;
         }
-      } else {
-        print(
-            '❌ Error del servidor al obtener productos: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ Excepción en getProductMatch: $e');
@@ -52,37 +74,114 @@ class RustApiChatService {
     return [];
   }
 
-  /// ✅ Obtener respuesta del chatbot desde la API en Rust
-  
-Future<String> getChatbotResponse(String mensajeUsuario) async {
-  try {
-    final uri = Uri.parse('$baseUrl/chatbot');
+  Future<List<ProductResponse>> _searchProducts(String query) async {
+    try {
+      final uri = _buildUri(
+        '/buscar',
+        {'q': query},
+      );
 
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'mensaje': mensajeUsuario}),
-    );
+      final response = await _client
+          .get(uri, headers: {'Accept': 'application/json'})
+          .timeout(const Duration(seconds: 12));
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData = jsonDecode(response.body);
-      return jsonData['respuesta'] ?? '⚠️ No se obtuvo respuesta del chatbot.';
-    } else {
-      return '❌ Error del servidor: ${response.statusCode}';
+      print('📥 GET $uri');
+      print('📥 Status getProductMatch: ${response.statusCode}');
+      print('📥 Body getProductMatch: ${response.body}');
+
+      if (response.statusCode != 200) {
+        print('❌ Error del servidor al obtener productos: ${response.statusCode}');
+        return [];
+      }
+
+      final decoded = jsonDecode(response.body);
+
+      if (decoded is! List) {
+        print('❌ La respuesta de /buscar no es una lista');
+        return [];
+      }
+
+      return decoded
+          .map<ProductResponse>((item) => ProductResponse.fromJson(item))
+          .toList();
+    } catch (e) {
+      print('❌ Excepción en _searchProducts("$query"): $e');
+      return [];
     }
-  } catch (e) {
-    return '❌ Error al obtener respuesta del chatbot: $e';
   }
-}
 
+  List<String> _buildFallbackQueries(String query) {
+    final words = query
+        .split(' ')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
 
-  /// ✅ Obtener lista ficticia de usuarios (modo demo)
+    final fallbacks = <String>{};
+
+    if (words.length > 1) {
+      fallbacks.add(words.join('%'));
+    }
+
+    final filteredWords = words.where((w) => w.length >= 3).toList();
+    if (filteredWords.length > 1) {
+      fallbacks.add(filteredWords.join(' '));
+    }
+
+    for (final word in filteredWords) {
+      fallbacks.add(word);
+    }
+
+    return fallbacks.toList();
+  }
+
+  Future<String> getChatbotResponse(String mensajeUsuario) async {
+    final message = mensajeUsuario.trim();
+
+    if (message.isEmpty) {
+      return '⚠️ Escribe un mensaje válido.';
+    }
+
+    try {
+      final uri = _buildUri('/chatbot');
+
+      final response = await _client
+          .post(
+        uri,
+        headers: _jsonHeaders,
+        body: jsonEncode({'mensaje': message}),
+      )
+          .timeout(const Duration(seconds: 12));
+
+      print('📥 POST $uri');
+      print('📥 Status chatbot: ${response.statusCode}');
+      print('📥 Body chatbot: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+
+        if (decoded is Map<String, dynamic>) {
+          return decoded['respuesta']?.toString() ??
+              '⚠️ No se obtuvo respuesta del chatbot.';
+        }
+
+        return '⚠️ Respuesta inválida del chatbot.';
+      }
+
+      return '❌ Error del servidor: ${response.statusCode}';
+    } on TimeoutException {
+      return '⏳ La consulta tardó demasiado. Intenta nuevamente.';
+    } catch (e) {
+      return '❌ Error al obtener respuesta del chatbot: $e';
+    }
+  }
+
   static Future<List<User>> getUsers({required int nrUsers}) async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     return List.generate(
       nrUsers,
-      (index) => User(
+          (index) => User(
         id: '$index',
         name: 'Usuario $index',
         profileImageUrl: 'https://i.pravatar.cc/150?img=$index',
@@ -90,38 +189,52 @@ Future<String> getChatbotResponse(String mensajeUsuario) async {
     );
   }
 
-  /// ✅ Obtener recomendaciones de stock desde la API
   Future<List<RecomendacionStockResponse>> getRecomendacionStock(String? ref) async {
-    if (ref == null || ref.isEmpty) {
+    final cleanedRef = ref?.trim();
+
+    if (cleanedRef == null || cleanedRef.isEmpty) {
       print('❌ Error: ref es null o vacía');
       return [];
     }
 
     try {
-      final uri = Uri.parse('$baseUrl/recomendados?ref=$ref');
-      final response = await http.get(uri);
+      final uri = _buildUri('/recomendados', {'ref': cleanedRef});
 
-      print('📥 Status: ${response.statusCode}');
-      print('📥 Body: ${response.body}');
+      final response = await _client
+          .get(uri, headers: {'Accept': 'application/json'})
+          .timeout(const Duration(seconds: 12));
 
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
+      print('📥 GET $uri');
+      print('📥 Status recomendacion-stock: ${response.statusCode}');
+      print('📥 Body recomendacion-stock: ${response.body}');
 
-        if (decoded is List) {
-          return decoded.map((e) => RecomendacionStockResponse.fromJson(e)).toList();
-        } else {
-          print('❌ Error: La respuesta no es una lista');
-          return [];
-        }
-      } else {
+      if (response.statusCode != 200) {
         print('❌ Error servidor recomendacion-stock: ${response.statusCode}');
+        return [];
       }
+
+      final decoded = jsonDecode(response.body);
+
+      if (decoded is! List) {
+        print('❌ Error: La respuesta no es una lista');
+        return [];
+      }
+
+      return decoded
+          .map<RecomendacionStockResponse>(
+            (e) => RecomendacionStockResponse.fromJson(e),
+      )
+          .toList();
+    } on TimeoutException {
+      print('❌ Timeout en getRecomendacionStock');
+      return [];
     } catch (e) {
       print('❌ Excepción en getRecomendacionStock: $e');
+      return [];
     }
-
-    return [];
   }
 
+  void dispose() {
+    _client.close();
+  }
 }
-
