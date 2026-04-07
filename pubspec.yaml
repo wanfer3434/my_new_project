@@ -12,6 +12,8 @@ dependencies:
 
   # Paquetes principales utilizados en el proyecto
   image_picker: ^1.2.1
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
   carousel_slider: ^5.0.0
   flutter_chat_ui: ^1.6.15
   flutter_chat_types: ^3.6.2
