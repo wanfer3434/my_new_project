@@ -1,36 +1,31 @@
 import 'package:flutter/material.dart';
-/*import 'package:flutter/rendering.dart';*/
 import 'package:provider/provider.dart';
-import 'package:my_new_project/screens/splash_page.dart';
-import 'package:my_new_project/models/category.dart';
-import 'package:my_new_project/screens/category/category_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Archivo generado por Firebase para las opciones de configuración.
-import 'package:my_new_project/screens/main/main_page.dart';
 
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Archivo generado por FlutterFire CLI
+import 'firebase_options.dart';
+import 'package:my_new_project/screens/category/category_provider.dart';
+import 'package:my_new_project/screens/main/main_page.dart';
+import 'package:my_new_project/providers/cart_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicialización de Firebase con las opciones específicas de la plataforma actual.
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  /*debugPaintSizeEnabled = true; // 🔥 ACTÍVALO*/
-  // Ejecuta la aplicación.
-  runApp(MyApp());
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Proveedor para el manejo de la lógica de la categoría.
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
         title: 'El mejor Servicio',
@@ -39,9 +34,9 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           canvasColor: Colors.transparent,
           primarySwatch: Colors.blue,
-          fontFamily: "Montserrat",
+          fontFamily: 'Montserrat',
         ),
-        home: MainPage(), // Página principal de la aplicación.
+        home: const MainPage(),
       ),
     );
   }
