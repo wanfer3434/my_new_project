@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:html' as html;
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class CheckoutService {
   static const String baseUrl = 'https://javier.tail33d395.ts.net';
@@ -32,14 +32,23 @@ class CheckoutService {
     }
 
     final Map<String, dynamic> data = jsonDecode(response.body);
-
     final String? checkoutUrl = data['checkout_url'] as String?;
 
     if (checkoutUrl == null || checkoutUrl.isEmpty) {
       throw Exception('La respuesta no contiene checkout_url válido');
     }
 
-    html.window.location.href = checkoutUrl;
+    final checkoutUri = Uri.parse(checkoutUrl);
+
+    final launched = await launchUrl(
+      checkoutUri,
+      mode: LaunchMode.platformDefault,
+    );
+
+    if (!launched) {
+      throw Exception('No se pudo abrir la URL de pago');
+    }
+
     return checkoutUrl;
   }
 }
