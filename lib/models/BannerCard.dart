@@ -11,10 +11,12 @@ class BannerCard extends StatelessWidget {
   final VoidCallback? onVideoClick;
   final String? referencia;
   final double? costo;
+  final String fallbackAsset;
 
   const BannerCard({
     Key? key,
     required this.imageUrl,
+    required this.fallbackAsset,
     this.videoUrl,
     this.videoButtonText,
     this.clicks = 0,
@@ -46,26 +48,29 @@ class BannerCard extends StatelessWidget {
             height: imageHeight,
             width: double.infinity,
             fit: BoxFit.cover,
-            placeholder: (context, url) => SizedBox(
+            placeholder: (context, url) => Image.asset(
+              fallbackAsset,
               height: imageHeight,
-              child: const Center(child: CircularProgressIndicator()),
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
-            errorWidget: (context, url, error) => Container(
+            errorWidget: (context, url, error) => Image.asset(
+              fallbackAsset,
               height: imageHeight,
-              color: Colors.amberAccent[300],
-              child: const Center(child: Icon(Icons.error)),
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
-
           Positioned(
             left: 16,
             top: 16,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (referencia != null)
+                if (referencia != null && referencia!.trim().isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(10),
@@ -79,9 +84,10 @@ class BannerCard extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
-                if (costo != null)
+                if (costo != null && costo! > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(10),
@@ -98,7 +104,6 @@ class BannerCard extends StatelessWidget {
               ],
             ),
           ),
-
           if (videoUrl != null && videoUrl!.trim().isNotEmpty)
             Positioned(
               bottom: 16,

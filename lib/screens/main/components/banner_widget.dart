@@ -20,6 +20,9 @@ class _BannerPageState extends State<BannerPage> {
   int _currentPage = 0;
   Timer? _timer;
 
+  static const double _bannerHeight = 280;
+  static const String _fallbackAsset = 'assets/samsun_roja_16mp.jpg';
+
   @override
   void initState() {
     super.initState();
@@ -35,9 +38,9 @@ class _BannerPageState extends State<BannerPage> {
 
   Future<List<dynamic>> fetchBanners() async {
     try {
-      final response = await http.get(
-        Uri.parse('https://javier.tail33d395.ts.net/banners'),
-      );
+      final response = await http
+          .get(Uri.parse('https://javier.tail33d395.ts.net/banners'))
+          .timeout(const Duration(seconds: 6));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -46,6 +49,7 @@ class _BannerPageState extends State<BannerPage> {
         return [];
       }
     } catch (e) {
+      debugPrint('Error cargando banners: $e');
       return [];
     }
   }
@@ -82,37 +86,56 @@ class _BannerPageState extends State<BannerPage> {
     }
   }
 
+  Widget _buildFallbackBanner(BuildContext context) {
+    return SizedBox(
+      height: _bannerHeight,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(20)),
+              child: Image.asset(
+                _fallbackAsset,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                'Cámaras y accesorios disponibles',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          _buildOverlayButtons(context),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final fallbackImage = Image.asset(
-      'assets/samsun_roja_16mp.jpg',
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: 280,
-    );
-
     return FutureBuilder<List<dynamic>>(
       future: banners,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(
-            height: 280,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return _buildFallbackBanner(context);
         }
 
         if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-          return SizedBox(
-            height: 280,
-            child: Stack(
-              children: [
-                Positioned.fill(child: fallbackImage),
-                _buildOverlayButtons(context),
-              ],
-            ),
-          );
+          return _buildFallbackBanner(context);
         }
 
         final bannerList = snapshot.data!;
@@ -122,7 +145,7 @@ class _BannerPageState extends State<BannerPage> {
         });
 
         return SizedBox(
-          height: 280,
+          height: _bannerHeight,
           child: Stack(
             children: [
               PageView.builder(
@@ -151,6 +174,7 @@ class _BannerPageState extends State<BannerPage> {
                     clicks: clicks,
                     referencia: referencia,
                     costo: costo,
+                    fallbackAsset: _fallbackAsset,
                     onVideoClick: () => incrementClick(banner['id']),
                   );
                 },
@@ -183,7 +207,7 @@ class _BannerPageState extends State<BannerPage> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => NotificationsPage(),
+                    builder: (_) => const NotificationsPage(),
                   ),
                 );
               },

@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 
 class BannerAdminPage extends StatefulWidget {
   const BannerAdminPage({super.key});
@@ -18,7 +17,6 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
   static const String adminToken = '8YfQm2NwL7rP4xVa9KdE3sHu6ZjC1tRb';
 
   final _formKey = GlobalKey<FormState>();
-  final ImagePicker _picker = ImagePicker();
 
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _referenciaController = TextEditingController();
@@ -29,9 +27,11 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
   final TextEditingController _ordenController =
   TextEditingController(text: '0');
 
-  XFile? _selectedImage;
+  Uint8List? _selectedImageBytes;
+  String? _selectedImageName;
   String? _archivoImagenGuardado;
   String? _imageUrlPreview;
+
   bool _activo = true;
   bool _isSaving = false;
   bool _isLoadingList = false;
@@ -62,9 +62,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
     });
 
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/banners'),
-      );
+      final response = await http.get(Uri.parse('$baseUrl/banners'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as List<dynamic>;
@@ -87,11 +85,23 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
 
   Future<void> _pickImage() async {
     try {
-      final image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image == null) return;
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+
+      if (result == null || result.files.isEmpty) return;
+
+      final file = result.files.first;
+
+      if (file.bytes == null) {
+        _showMessage('No se pudo leer la imagen');
+        return;
+      }
 
       setState(() {
-        _selectedImage = image;
+        _selectedImageBytes = file.bytes!;
+        _selectedImageName = file.name;
         _archivoImagenGuardado = null;
         _imageUrlPreview = null;
       });
@@ -101,7 +111,9 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
   }
 
   Future<String?> _uploadImage() async {
-    if (_selectedImage == null) return _archivoImagenGuardado;
+    if (_selectedImageBytes == null || _selectedImageName == null) {
+      return _archivoImagenGuardado;
+    }
 
     try {
       final request = http.MultipartRequest(
@@ -111,24 +123,13 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
 
       request.headers['Authorization'] = 'Bearer $adminToken';
 
-      if (kIsWeb) {
-        final bytes = await _selectedImage!.readAsBytes();
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'file',
-            bytes,
-            filename: _selectedImage!.name,
-          ),
-        );
-      } else {
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'file',
-            _selectedImage!.path,
-            filename: _selectedImage!.name,
-          ),
-        );
-      }
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          _selectedImageBytes!,
+          filename: _selectedImageName!,
+        ),
+      );
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
@@ -139,6 +140,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
       }
 
       final data = jsonDecode(response.body);
+
       setState(() {
         _archivoImagenGuardado = data['archivo_imagen'];
         _imageUrlPreview = data['image_url'];
@@ -161,7 +163,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
     try {
       String? archivoImagen = _archivoImagenGuardado;
 
-      if (_selectedImage != null) {
+      if (_selectedImageBytes != null) {
         archivoImagen = await _uploadImage();
       }
 
@@ -206,8 +208,8 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
         final updateBody = Map<String, dynamic>.from(body);
 
         if ((updateBody['archivo_imagen'] as String).isEmpty) {
-          final existing = _banners.firstWhere(
-                (item) => item['id'] == _editingBannerId,
+          final existing = _banners.cast<dynamic?>().firstWhere(
+                (item) => item != null && item['id'] == _editingBannerId,
             orElse: () => null,
           );
           if (existing != null) {
@@ -247,6 +249,52 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
     }
   }
 
+  Future<void> _deleteBanner(int id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar banner'),
+        content: const Text(
+          '¿Seguro que deseas eliminar este banner?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    ) ??
+        false;
+
+    if (!confirm) return;
+
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/admin/banners/$id'),
+        headers: {
+          'Authorization': 'Bearer $adminToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _showMessage('Banner eliminado correctamente');
+        if (_editingBannerId == id) {
+          _clearForm();
+        }
+        await _loadBanners();
+      } else {
+        _showMessage('Error eliminando banner: ${response.body}');
+      }
+    } catch (e) {
+      _showMessage('Error eliminando banner: $e');
+    }
+  }
+
   void _loadBannerIntoForm(dynamic banner) {
     setState(() {
       _editingBannerId = banner['id'];
@@ -263,14 +311,14 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
       _archivoImagenGuardado = banner['archivo_imagen'];
       _imageUrlPreview =
       '$baseUrl/static/images/${banner['archivo_imagen']}';
-      _selectedImage = null;
+      _selectedImageBytes = null;
+      _selectedImageName = null;
     });
 
     _showMessage('Banner cargado para edición');
   }
 
   void _clearForm() {
-    _formKey.currentState?.reset();
     _nombreController.clear();
     _referenciaController.clear();
     _costoController.clear();
@@ -279,7 +327,8 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
     _ordenController.text = '0';
 
     setState(() {
-      _selectedImage = null;
+      _selectedImageBytes = null;
+      _selectedImageName = null;
       _archivoImagenGuardado = null;
       _imageUrlPreview = null;
       _activo = true;
@@ -297,39 +346,16 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
   Widget _buildPreviewCard() {
     Widget imageWidget;
 
-    if (_selectedImage != null) {
-      if (kIsWeb) {
-        imageWidget = FutureBuilder<Uint8List>(
-          future: _selectedImage!.readAsBytes(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox(
-                height: 180,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.memory(
-                snapshot.data!,
-                height: 190,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            );
-          },
-        );
-      } else {
-        imageWidget = ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.file(
-            File(_selectedImage!.path),
-            height: 190,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        );
-      }
+    if (_selectedImageBytes != null) {
+      imageWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.memory(
+          _selectedImageBytes!,
+          height: 190,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      );
     } else if (_imageUrlPreview != null) {
       imageWidget = ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -567,6 +593,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
         final costo = banner['costo'];
         final orden = banner['orden'] ?? 0;
         final activo = (banner['activo'] ?? 1) == 1;
+        final id = banner['id'];
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -612,7 +639,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Costo: \$${(costo ?? 0).toString()}  |  Orden: $orden  |  ${activo ? "Activo" : "Inactivo"}',
+                        'Costo: \$${(costo ?? 0).toString()} | Orden: $orden | ${activo ? "Activo" : "Inactivo"}',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade700,
@@ -625,6 +652,11 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
                   tooltip: 'Editar',
                   onPressed: () => _loadBannerIntoForm(banner),
                   icon: const Icon(Icons.edit_outlined),
+                ),
+                IconButton(
+                  tooltip: 'Eliminar',
+                  onPressed: () => _deleteBanner(id),
+                  icon: const Icon(Icons.delete_outline),
                 ),
               ],
             ),

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:my_new_project/providers/cart_provider.dart';
+import 'package:my_new_project/screens/cart/cart_page.dart';
 
 import 'package:my_new_project/models/product.dart';
 import 'package:my_new_project/screens/profile_page.dart';
@@ -112,9 +115,55 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CategoryProvider(),
-      child: Scaffold(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Twin Yogo'),
+        actions: [
+          Consumer<CartProvider>(
+            builder: (context, cart, child) {
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.shopping_cart),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CartPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  if (cart.itemCount > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          '${cart.itemCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
         bottomNavigationBar: CustomBottomBar(controller: bottomTabController),
 
         // WhatsApp button
@@ -263,7 +312,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             ),
           ],
         ),
-      ),
     );
   }
 }

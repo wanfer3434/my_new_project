@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:provider/provider.dart';
+
 import 'package:my_new_project/models/product.dart';
+import 'package:my_new_project/providers/cart_provider.dart';
 import 'package:my_new_project/screens/product/product_page.dart';
 
 class ProductCard extends StatefulWidget {
@@ -36,15 +39,13 @@ class _ProductCardState extends State<ProductCard> {
     super.initState();
     _pageController = PageController();
 
-    // 🔄 AUTOPLAY (solo si hay más de 1 imagen)
     if (widget.product.imageUrls.length > 1) {
       _autoSwipeTimer = Timer.periodic(
         const Duration(seconds: 3),
             (_) {
           if (!mounted) return;
 
-          _currentPage =
-              (_currentPage + 1) % widget.product.imageUrls.length;
+          _currentPage = (_currentPage + 1) % widget.product.imageUrls.length;
 
           _pageController.animateToPage(
             _currentPage,
@@ -71,6 +72,17 @@ class _ProductCardState extends State<ProductCard> {
     });
   }
 
+  int _getProductId() {
+    return widget.product.name.hashCode;
+  }
+
+  String _getMainImage() {
+    if (widget.product.imageUrls.isNotEmpty) {
+      return widget.product.imageUrls.first;
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -89,8 +101,6 @@ class _ProductCardState extends State<ProductCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // 🖼️ IMÁGENES CON SWIPE + AUTOPLAY
             Stack(
               children: [
                 SizedBox(
@@ -98,7 +108,11 @@ class _ProductCardState extends State<ProductCard> {
                   width: double.infinity,
                   child: PageView.builder(
                     controller: _pageController,
-                    onPageChanged: (i) => _currentPage = i,
+                    onPageChanged: (i) {
+                      setState(() {
+                        _currentPage = i;
+                      });
+                    },
                     itemCount: widget.product.imageUrls.length,
                     itemBuilder: (_, index) {
                       return CachedNetworkImage(
@@ -113,8 +127,6 @@ class _ProductCardState extends State<ProductCard> {
                     },
                   ),
                 ),
-
-                // 🟢 INDICADOR
                 if (widget.product.imageUrls.length > 1)
                   Positioned(
                     bottom: 8,
@@ -135,64 +147,88 @@ class _ProductCardState extends State<ProductCard> {
                   ),
               ],
             ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.product.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.product.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$${widget.product.price.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      RatingBar.builder(
+                        initialRating: _currentRating,
+                        minRating: 1,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemSize: 18,
+                        itemBuilder: (_, __) => const Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        onRatingUpdate: (rating) {
+                          _currentRating = rating;
+                          _saveRating(rating);
+                        },
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Promedio: ${_averageRating.toStringAsFixed(1)} ($_ratingCount)',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.black45,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            context.read<CartProvider>().addItem(
+                              id: _getProductId(),
+                              name: widget.product.name,
+                              price: widget.product.price.toDouble(),
+                              imageUrl: _getMainImage(),
+                            );
 
-            // 📦 INFO
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${widget.product.name} agregado al carrito',
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.shopping_cart_outlined),
+                          label: const Text('Agregar'),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.product.description,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${widget.product.price.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-
-                  // ⭐ RATING
-                  RatingBar.builder(
-                    initialRating: _currentRating,
-                    minRating: 1,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemSize: 18,
-                    itemBuilder: (_, __) => const Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                    ),
-                    onRatingUpdate: (rating) {
-                      _currentRating = rating;
-                      _saveRating(rating);
-                    },
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Promedio: ${_averageRating.toStringAsFixed(1)} ($_ratingCount)',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.black45,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
