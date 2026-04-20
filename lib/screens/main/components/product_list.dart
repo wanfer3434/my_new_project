@@ -11,8 +11,8 @@ class ProductList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardHeight = MediaQuery.of(context).size.height * 0.5;
-    final double cardWidth = MediaQuery.of(context).size.width * 0.2;
+    final double cardHeight = MediaQuery.of(context).size.height * 0.58;
+    final double cardWidth = MediaQuery.of(context).size.width * 0.22;
     const double paginationSize = 8.0;
 
     return SizedBox(
@@ -61,11 +61,14 @@ class ProductList extends StatelessWidget {
               );
             }
 
-            return const Padding(
-              padding: EdgeInsets.all(8.0),
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: SizedBox.shrink(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: dots,
+                ),
               ),
             );
           },

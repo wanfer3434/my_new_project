@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:provider/provider.dart';
 
+import '../../../cart_provider.dart';
 import '../../chat_page.dart';
 import '../../notifications_page.dart';
 import '../../../models/BannerCard.dart';
@@ -21,7 +23,8 @@ class _BannerPageState extends State<BannerPage> {
   Timer? _timer;
 
   static const double _bannerHeight = 280;
-  static const String _fallbackAsset = 'assets/samsun_roja_16mp.jpg';
+  static const String _fallbackAsset = 'assets/camarasDigitales.jpeg';
+  static const String _baseUrl = 'https://javier.tail33d395.ts.net';
 
   @override
   void initState() {
@@ -39,7 +42,7 @@ class _BannerPageState extends State<BannerPage> {
   Future<List<dynamic>> fetchBanners() async {
     try {
       final response = await http
-          .get(Uri.parse('https://javier.tail33d395.ts.net/banners'))
+          .get(Uri.parse('$_baseUrl/banners'))
           .timeout(const Duration(seconds: 6));
 
       if (response.statusCode == 200) {
@@ -79,11 +82,36 @@ class _BannerPageState extends State<BannerPage> {
   void incrementClick(int bannerId) async {
     try {
       await http.post(
-        Uri.parse('https://javier.tail33d395.ts.net/banners/click/$bannerId'),
+        Uri.parse('$_baseUrl/banners/click/$bannerId'),
       );
     } catch (e) {
       debugPrint('Error actualizando clicks: $e');
     }
+  }
+
+  void _addBannerToCart(BuildContext context, dynamic banner) {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+
+    final int id = banner['id'] ?? 0;
+    final String referencia =
+    (banner['referencia'] ?? banner['nombre'] ?? 'Cámara').toString();
+    final double costo = ((banner['costo'] ?? 0) as num).toDouble();
+    final String imageUrl =
+        '$_baseUrl/static/images/${banner['archivo_imagen']}';
+
+    cart.addItem(
+      id: id,
+      name: referencia,
+      price: costo,
+      imageUrl: imageUrl,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$referencia agregado al carrito'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   Widget _buildFallbackBanner(BuildContext context) {
@@ -159,9 +187,9 @@ class _BannerPageState extends State<BannerPage> {
                 itemBuilder: (context, index) {
                   final banner = bannerList[index];
                   final referencia = banner['referencia'];
-                  final costo = (banner['costo'] ?? 0).toDouble();
-                  final imageUrl =
-                      'https://javier.tail33d395.ts.net/static/images/${banner['archivo_imagen']}';
+                  final double costo = ((banner['costo'] ?? 0) as num).toDouble();
+                  final String imageUrl =
+                      '$_baseUrl/static/images/${banner['archivo_imagen']}';
                   final videoUrl = banner['video_url'];
                   final buttonText =
                       banner['button_text'] ?? 'Ver demostración';
@@ -176,6 +204,7 @@ class _BannerPageState extends State<BannerPage> {
                     costo: costo,
                     fallbackAsset: _fallbackAsset,
                     onVideoClick: () => incrementClick(banner['id']),
+                    onAddToCart: () => _addBannerToCart(context, banner),
                   );
                 },
               ),

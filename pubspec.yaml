@@ -55,6 +55,7 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+    - assets/camarasDigitales.jpeg
 
   fonts:
     - family: Montserrat

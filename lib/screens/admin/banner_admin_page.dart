@@ -64,6 +64,9 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
     try {
       final response = await http.get(Uri.parse('$baseUrl/banners'));
 
+      debugPrint('Status banners: ${response.statusCode}');
+      debugPrint('Body banners: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as List<dynamic>;
         setState(() {
@@ -94,8 +97,8 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
 
       final file = result.files.first;
 
-      if (file.bytes == null) {
-        _showMessage('No se pudo leer la imagen');
+      if (file.bytes == null || file.bytes!.isEmpty) {
+        _showMessage('La imagen seleccionada está vacía o no se pudo leer');
         return;
       }
 
@@ -105,6 +108,9 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
         _archivoImagenGuardado = null;
         _imageUrlPreview = null;
       });
+
+      debugPrint('Imagen seleccionada: ${file.name}');
+      debugPrint('Tamaño bytes: ${file.bytes!.length}');
     } catch (e) {
       _showMessage('Error seleccionando imagen: $e');
     }
@@ -116,6 +122,11 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
     }
 
     try {
+      debugPrint('=== SUBIENDO IMAGEN ===');
+      debugPrint('Nombre archivo: $_selectedImageName');
+      debugPrint('Bytes: ${_selectedImageBytes?.length}');
+      debugPrint('URL: $baseUrl/admin/upload-banner-image');
+
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/admin/upload-banner-image'),
@@ -134,20 +145,24 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
+      debugPrint('Status upload: ${response.statusCode}');
+      debugPrint('Body upload: ${response.body}');
+
       if (response.statusCode != 200) {
         _showMessage('Error subiendo imagen: ${response.body}');
         return null;
       }
 
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
 
       setState(() {
-        _archivoImagenGuardado = data['archivo_imagen'];
-        _imageUrlPreview = data['image_url'];
+        _archivoImagenGuardado = data['archivo_imagen']?.toString();
+        _imageUrlPreview = data['image_url']?.toString();
       });
 
       return _archivoImagenGuardado;
     } catch (e) {
+      debugPrint('Excepción upload: $e');
       _showMessage('Error subiendo imagen: $e');
       return null;
     }
@@ -169,10 +184,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
 
       if ((archivoImagen == null || archivoImagen.isEmpty) &&
           _editingBannerId == null) {
-        _showMessage('Selecciona una imagen para crear el banner');
-        setState(() {
-          _isSaving = false;
-        });
+        _showMessage('Selecciona una imagen válida para crear el banner');
         return;
       }
 
@@ -192,6 +204,10 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
         'activo': _activo ? 1 : 0,
         'orden': int.tryParse(_ordenController.text.trim()) ?? 0,
       };
+
+      debugPrint('=== GUARDANDO BANNER ===');
+      debugPrint('Editing ID: $_editingBannerId');
+      debugPrint('Body: ${jsonEncode(body)}');
 
       http.Response response;
 
@@ -227,6 +243,9 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
         );
       }
 
+      debugPrint('Status guardar: ${response.statusCode}');
+      debugPrint('Body guardar: ${response.body}');
+
       if (response.statusCode == 200) {
         _showMessage(
           _editingBannerId == null
@@ -254,9 +273,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Eliminar banner'),
-        content: const Text(
-          '¿Seguro que deseas eliminar este banner?',
-        ),
+        content: const Text('¿Seguro que deseas eliminar este banner?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -309,8 +326,7 @@ class _BannerAdminPageState extends State<BannerAdminPage> {
       _ordenController.text = '${banner['orden'] ?? 0}';
       _activo = (banner['activo'] ?? 1) == 1;
       _archivoImagenGuardado = banner['archivo_imagen'];
-      _imageUrlPreview =
-      '$baseUrl/static/images/${banner['archivo_imagen']}';
+      _imageUrlPreview = '$baseUrl/static/images/${banner['archivo_imagen']}';
       _selectedImageBytes = null;
       _selectedImageName = null;
     });

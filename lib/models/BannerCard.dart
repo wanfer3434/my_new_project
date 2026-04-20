@@ -12,6 +12,7 @@ class BannerCard extends StatelessWidget {
   final String? referencia;
   final double? costo;
   final String fallbackAsset;
+  final VoidCallback? onAddToCart;
 
   const BannerCard({
     Key? key,
@@ -24,6 +25,7 @@ class BannerCard extends StatelessWidget {
     this.onVideoClick,
     this.referencia,
     this.costo,
+    this.onAddToCart,
   }) : super(key: key);
 
   Future<void> _openVideo() async {
@@ -41,97 +43,110 @@ class BannerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-      child: Stack(
-        children: [
-          CachedNetworkImage(
-            imageUrl: imageUrl,
-            height: imageHeight,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Image.asset(
-              fallbackAsset,
-              height: imageHeight,
-              width: double.infinity,
+      child: SizedBox(
+        height: imageHeight,
+        width: double.infinity,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CachedNetworkImage(
+              imageUrl: imageUrl,
               fit: BoxFit.cover,
+              placeholder: (context, url) => Image.asset(
+                fallbackAsset,
+                fit: BoxFit.cover,
+              ),
+              errorWidget: (context, url, error) => Image.asset(
+                fallbackAsset,
+                fit: BoxFit.cover,
+              ),
             ),
-            errorWidget: (context, url, error) => Image.asset(
-              fallbackAsset,
-              height: imageHeight,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned(
-            left: 16,
-            top: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (referencia != null && referencia!.trim().isNotEmpty)
-                  Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      referencia!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 8),
-                if (costo != null && costo! > 0)
-                  Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '\$${costo!.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          if (videoUrl != null && videoUrl!.trim().isNotEmpty)
             Positioned(
-              bottom: 16,
               left: 16,
+              top: 16,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '$clicks ${clicks == 1 ? "vista" : "vistas"}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  if (referencia != null && referencia!.trim().isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        referencia!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.play_arrow),
-                    label: Text(videoButtonText ?? 'Ver demostración'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white70,
-                      foregroundColor: Colors.black87,
+                  const SizedBox(height: 8),
+                  if (costo != null && costo! > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '\$${costo!.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    onPressed: _openVideo,
-                  ),
                 ],
               ),
             ),
-        ],
+            if (videoUrl != null && videoUrl!.trim().isNotEmpty)
+              Positioned(
+                bottom: 16,
+                left: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$clicks ${clicks == 1 ? "vista" : "vistas"}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.play_arrow),
+                      label: Text(videoButtonText ?? 'Ver demostración'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white70,
+                        foregroundColor: Colors.black87,
+                      ),
+                      onPressed: _openVideo,
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.shopping_cart),
+                      label: const Text('Agregar al carrito'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: onAddToCart,
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

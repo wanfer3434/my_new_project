@@ -104,7 +104,7 @@ class _ProductCardState extends State<ProductCard> {
             Stack(
               children: [
                 SizedBox(
-                  height: widget.height * 0.65,
+                  height: widget.height * 0.50,
                   width: double.infinity,
                   child: PageView.builder(
                     controller: _pageController,
@@ -149,85 +149,83 @@ class _ProductCardState extends State<ProductCard> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.product.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.product.description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.product.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '\$${widget.product.price.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '\$${widget.product.price.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    RatingBar.builder(
+                      initialRating: _currentRating,
+                      minRating: 1,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemSize: 18,
+                      itemBuilder: (_, __) => const Icon(
+                        Icons.star,
+                        color: Colors.amber,
                       ),
-                      const SizedBox(height: 4),
-                      RatingBar.builder(
-                        initialRating: _currentRating,
-                        minRating: 1,
-                        allowHalfRating: true,
-                        itemCount: 5,
-                        itemSize: 18,
-                        itemBuilder: (_, __) => const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        onRatingUpdate: (rating) {
-                          _currentRating = rating;
-                          _saveRating(rating);
-                        },
+                      onRatingUpdate: (rating) {
+                        _currentRating = rating;
+                        _saveRating(rating);
+                      },
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Promedio: ${_averageRating.toStringAsFixed(1)} ($_ratingCount)',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.black45,
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Promedio: ${_averageRating.toStringAsFixed(1)} ($_ratingCount)',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.black45,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            context.read<CartProvider>().addItem(
-                              id: _getProductId(),
-                              name: widget.product.name,
-                              price: widget.product.price.toDouble(),
-                              imageUrl: _getMainImage(),
-                            );
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          context.read<CartProvider>().addItem(
+                            id: _getProductId(),
+                            name: widget.product.name,
+                            price: widget.product.price.toDouble(),
+                            imageUrl: _getMainImage(),
+                          );
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '${widget.product.name} agregado al carrito',
-                                ),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '${widget.product.name} agregado al carrito',
                               ),
-                            );
-                          },
-                          icon: const Icon(Icons.shopping_cart_outlined),
-                          label: const Text('Agregar'),
-                        ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.shopping_cart_outlined),
+                        label: const Text('Agregar'),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -18,6 +18,7 @@ import '../ProfilePage/contact_page.dart';
 import '../ProfilePage/privacy_page.dart';
 import '../category/category_list_page.dart';
 
+import '../crypto_dashboard_screen.dart';
 import '../service/recomendaciones_page.dart';
 import '../service/rust_api_chat_service.dart';
 import 'components/banner_widget.dart';
@@ -57,7 +58,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     tabController = TabController(length: tabNames.length, vsync: this);
-    bottomTabController = TabController(length: 4, vsync: this);
+    bottomTabController = TabController(length: 5, vsync: this);
     products = LocalProductService().getProducts();
   }
 
@@ -222,6 +223,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   CategoryListPage(),
                   CheckOutPage(),
                   ProfilePage(),
+                  CryptoDashboardScreen(), // 🔥 NUEVO
                 ],
               ),
             ),
