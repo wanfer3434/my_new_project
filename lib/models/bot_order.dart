@@ -30,9 +30,13 @@ class BotOrder {
           : int.tryParse(json['id'].toString()) ?? 0,
       symbol: json['symbol']?.toString() ?? '',
       side: json['side']?.toString() ?? '',
-      quoteSpent: (json['quote_spent'] as num?)?.toDouble() ?? 0.0,
-      baseQty: (json['base_qty'] as num?)?.toDouble(),
-      price: (json['price'] as num?)?.toDouble(),
+      quoteSpent: double.tryParse(json['quote_spent']?.toString() ?? '0') ?? 0.0,
+      baseQty: json['base_qty'] == null
+          ? null
+          : double.tryParse(json['base_qty'].toString()),
+      price: json['price'] == null
+          ? null
+          : double.tryParse(json['price'].toString()),
       status: json['status']?.toString() ?? '',
       exchangeOrderId: json['exchange_order_id']?.toString(),
       rawResponse: json['raw_response']?.toString(),
