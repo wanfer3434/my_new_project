@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_new_project/screens/admin/banner_admin_page.dart';
+import 'package:my_new_project/screens/admin/ventas_admin_page.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
@@ -20,6 +21,7 @@ class NotificationsPage extends StatelessWidget {
             const SizedBox(height: 16),
             _buildSectionTitle('Acciones rápidas'),
             const SizedBox(height: 10),
+
             _buildActionCard(
               context,
               icon: Icons.campaign,
@@ -34,6 +36,22 @@ class NotificationsPage extends StatelessWidget {
                 );
               },
             ),
+
+            _buildActionCard(
+              context,
+              icon: Icons.point_of_sale,
+              title: 'Registrar venta / Ventas de hoy',
+              subtitle:
+              'Guarda ventas, descuenta stock y revisa cuánto llevas vendido hoy.',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const VentasAdminPage(),
+                  ),
+                );
+              },
+            ),
+
             _buildActionCard(
               context,
               icon: Icons.inventory_2_outlined,
@@ -44,6 +62,7 @@ class NotificationsPage extends StatelessWidget {
                 _showComingSoon(context, 'Inventario y referencias');
               },
             ),
+
             _buildActionCard(
               context,
               icon: Icons.bar_chart,
@@ -54,6 +73,7 @@ class NotificationsPage extends StatelessWidget {
                 _showComingSoon(context, 'Métricas del negocio');
               },
             ),
+
             _buildActionCard(
               context,
               icon: Icons.people_alt_outlined,
@@ -64,21 +84,25 @@ class NotificationsPage extends StatelessWidget {
                 _showComingSoon(context, 'Leads y clientes');
               },
             ),
+
             const SizedBox(height: 20),
             _buildSectionTitle('Recordatorios útiles'),
             const SizedBox(height: 10),
+
             _buildInfoCard(
               icon: Icons.info_outline,
               title: 'Consejo para vender más',
               description:
               'Mantén los primeros banners con tus cámaras más llamativas, precio visible y video de demostración.',
             ),
+
             _buildInfoCard(
               icon: Icons.image_outlined,
               title: 'Imágenes recomendadas',
               description:
               'Usa fotos claras, fondo limpio y nombres bien organizados para que el banner cargue sin errores.',
             ),
+
             _buildInfoCard(
               icon: Icons.smartphone,
               title: 'Promociona accesorios',
@@ -118,7 +142,7 @@ class NotificationsPage extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            'Gestiona banners, promociones y herramientas clave para vender cámaras y accesorios móviles.',
+            'Gestiona banners, ventas, promociones y herramientas clave para vender cámaras y accesorios móviles.',
             style: TextStyle(
               color: Colors.white70,
               fontSize: 14,

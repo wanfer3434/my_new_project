@@ -24,7 +24,7 @@ class _BannerPageState extends State<BannerPage> {
 
   static const double _bannerHeight = 280;
   static const String _fallbackAsset = 'assets/camarasDigitales.jpeg';
-  static const String _baseUrl = 'https://javier.tail33d395.ts.net';
+  static const String _baseUrl = 'https://javier-1.tail33d395.ts.net';
 
   @override
   void initState() {

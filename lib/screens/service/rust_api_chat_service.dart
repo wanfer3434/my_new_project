@@ -20,10 +20,11 @@ class User {
 }
 
 class RustApiChatService {
-  static const String baseUrl = 'https://javier.tail33d395.ts.net';
+
+  static const String baseUrl = 'https://javier-1.tail33d395.ts.net';
 
   // Pon aquí tu token admin real si tu backend lo exige para /portfolio, /orders y /bot/*
-  static const String adminToken = 'c7b55f385ee8f7fb400275631243505e584ef71b636e7be8e30d686a5571d1d9';
+  static const String adminToken = 'fe62823e3f876ad1a9cd859fd1518dcd6ee2ac70a06e947b049fafc65d7d59a2';
 
   final http.Client _client;
 
@@ -430,6 +431,50 @@ class RustApiChatService {
       throw Exception('Error en toggleBot: $e');
     }
   }
+
+  Future<Map<String, dynamic>?> getPosition() async {
+    try {
+      final uri = _buildUri('/api/bot/position');
+
+      final response = await _client
+          .get(uri, headers: _authHeaders)
+          .timeout(const Duration(seconds: 12));
+
+      print('📥 GET $uri');
+      print('📥 Status bot/position: ${response.statusCode}');
+      print('📥 Body bot/position: ${response.body}');
+
+      if (response.statusCode != 200) {
+        throw Exception('Error obteniendo posición: ${response.statusCode}');
+      }
+
+      final decoded = jsonDecode(response.body);
+
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+
+      throw Exception('La respuesta de /api/bot/position no es un objeto');
+    } on TimeoutException {
+      throw Exception('Timeout al obtener posición');
+    } catch (e) {
+      throw Exception('Error en getPosition: $e');
+    }
+  }
+  Future<Map<String,dynamic>> getMetricas() async {
+
+    final uri = _buildUri('/metricas');
+
+    final response = await _client.get(uri);
+
+    if(response.statusCode!=200){
+      throw Exception("Error");
+    }
+
+    return jsonDecode(response.body);
+
+  }
+
 
   Future<bool> updateBotConfig({
     required String symbol,

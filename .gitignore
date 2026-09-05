@@ -90,3 +90,5 @@ app.*.map.json
 *.jks
 *.keystore
 ngrok*
+
+.firebase/

@@ -13,8 +13,8 @@ class BannerAdminPage extends StatefulWidget {
 }
 
 class _BannerAdminPageState extends State<BannerAdminPage> {
-  static const String baseUrl = 'https://javier.tail33d395.ts.net';
-  static const String adminToken = '8YfQm2NwL7rP4xVa9KdE3sHu6ZjC1tRb';
+  static const String baseUrl = 'https://javier-1.tail33d395.ts.net';
+  static const String adminToken = 'fe62823e3f876ad1a9cd859fd1518dcd6ee2ac70a06e947b049fafc65d7d59a2';
 
   final _formKey = GlobalKey<FormState>();
 

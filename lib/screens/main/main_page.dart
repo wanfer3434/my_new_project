@@ -16,6 +16,7 @@ import '../../models/recomendacion_stock_response.dart';
 import '../ProfilePage/about_page.dart';
 import '../ProfilePage/contact_page.dart';
 import '../ProfilePage/privacy_page.dart';
+import '../business/business_center_page.dart';
 import '../category/category_list_page.dart';
 
 import '../crypto_dashboard_screen.dart';
@@ -223,7 +224,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                   CategoryListPage(),
                   CheckOutPage(),
                   ProfilePage(),
-                  CryptoDashboardScreen(), // 🔥 NUEVO
+                  BusinessCenterPage(),
+                  //CryptoDashboardPage(), // 🔥 NUEVO
                 ],
               ),
             ),
