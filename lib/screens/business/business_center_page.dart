@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../service/rust_api_chat_service.dart';
 
+import 'montitech_content_page.dart';
+
 
 
 class BusinessCenterPage extends StatefulWidget {
@@ -266,6 +268,26 @@ class _BusinessCenterPageState
                 "Analiza ventas, recomienda compras y detecta oportunidades.",
 
 
+              ),
+              const SizedBox(height: 20),
+
+              _buildTitle(
+                "Contenido",
+              ),
+
+              BusinessActionCard(
+                icon: Icons.play_circle_fill,
+                title: "MontiTech YouTube",
+                description:
+                "Crea y automatiza contenido para tu canal de cámaras.",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const MontiTechContentPage(),
+                    ),
+                  );
+                },
               ),
 
 
@@ -896,6 +918,8 @@ class BusinessActionCard extends StatelessWidget{
 
   final String description;
 
+  final VoidCallback? onTap;
+
 
 
 
@@ -913,6 +937,7 @@ class BusinessActionCard extends StatelessWidget{
 
     required this.description,
 
+    this.onTap,
 
   });
 
@@ -963,7 +988,7 @@ class BusinessActionCard extends StatelessWidget{
         ),
 
 
-
+          onTap: onTap
       ),
 
 

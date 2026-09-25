@@ -1,758 +1,267 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:my_new_project/screens/service/rust_api_chat_service.dart';
-import '../models/bot_order.dart';
-import '../models/portfolio_balance.dart';
+// lib/screens/crypto_dashboard_page.dart
 
-class CryptoDashboardScreen extends StatefulWidget {
-  const CryptoDashboardScreen({super.key});
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class CryptoDashboardPage extends StatefulWidget {
+  const CryptoDashboardPage({super.key});
 
   @override
-  State<CryptoDashboardScreen> createState() => _CryptoDashboardScreenState();
+  State<CryptoDashboardPage> createState() => _CryptoDashboardPageState();
 }
 
-class _CryptoDashboardScreenState extends State<CryptoDashboardScreen> {
-  late final RustApiChatService api;
+class _CryptoDashboardPageState extends State<CryptoDashboardPage> {
+  final String baseUrl = 'https://javier-1.tail33d395.ts.net';
 
   bool loading = true;
-  bool runningBot = false;
-  bool togglingBot = false;
-  bool savingConfig = false;
+  Timer? refreshTimer;
 
-  String statusMessage = '';
-  String statusType = 'info';
+  List<double> btcPrices = [];
+  List<BotSignalPoint> botSignals = [];
 
-  List<PortfolioBalance> balances = [];
-  List<BotOrder> orders = [];
-
-  bool botActive = false;
-  String botMode = 'DRY_RUN';
-  String selectedSymbol = 'BTCUSDT';
-  double selectedAmount = 10.0;
-  String? fromDate;
-  String? toDate;
-  double usdtBalance = 0.0;
+  BotStatus botStatus = BotStatus.empty();
 
   @override
   void initState() {
     super.initState();
-    api = RustApiChatService();
-    loadData();
+    _loadDashboard();
+
+    refreshTimer = Timer.periodic(
+      const Duration(seconds: 20),
+          (_) => _loadDashboard(),
+    );
   }
 
-  void updateUsdtBalance() {
-    final exact = balances.where((b) => b.asset.toUpperCase() == 'USDT');
-    if (exact.isNotEmpty) {
-      usdtBalance = double.tryParse(exact.first.free) ?? 0.0;
-      return;
-    }
-
-    final flexible = balances.where((b) => b.asset.toUpperCase().contains('USDT'));
-    if (flexible.isNotEmpty) {
-      usdtBalance = double.tryParse(flexible.first.free) ?? 0.0;
-      return;
-    }
-
-    usdtBalance = 0.0;
+  @override
+  void dispose() {
+    refreshTimer?.cancel();
+    super.dispose();
   }
 
-  Color _statusCardColor() {
-    switch (statusType) {
-      case 'success':
-        return Colors.green.shade50;
-      case 'error':
-        return Colors.red.shade50;
-      default:
-        return Colors.blue.shade50;
-    }
-  }
-
-  Color _statusTextColor() {
-    switch (statusType) {
-      case 'success':
-        return Colors.green.shade900;
-      case 'error':
-        return Colors.red.shade900;
-      default:
-        return Colors.blue.shade900;
-    }
-  }
-
-  void _setStatus(String message, {String type = 'info'}) {
-    if (!mounted) return;
-    setState(() {
-      statusMessage = message;
-      statusType = type;
-    });
-  }
-
-  Future<void> loadData() async {
-    if (!mounted) return;
-
-    setState(() {
-      loading = true;
-      statusMessage = '';
-    });
-
+  // =========================
+  // DASHBOARD
+  // =========================
+  Future<void> _loadDashboard() async {
     try {
-      final portfolio = await api.getPortfolio();
-      final orderList = await api.getOrders();
+      final res = await http.get(
+        Uri.parse('$baseUrl/bot/status'),
+        headers: {
+          'Authorization':
+          'Bearer TU_TOKEN',
+        },
+      );
 
-      Map<String, dynamic>? botStatus;
-      try {
-        botStatus = await api.getBotStatus();
-      } catch (_) {}
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
 
-      if (!mounted) return;
+        setState(() {
+          botStatus = BotStatus.fromJson(data);
+          loading = false;
+        });
 
-      setState(() {
-        balances = portfolio;
-        orders = orderList;
-
-        if (botStatus != null) {
-          botActive = botStatus['active'] ?? botActive;
-          botMode = (botStatus['mode'] ?? botMode).toString();
-          selectedSymbol = (botStatus['symbol'] ?? selectedSymbol).toString();
-
-          final rawAmount = botStatus['amount'];
-          if (rawAmount is num) {
-            selectedAmount = rawAmount.toDouble();
-          } else {
-            selectedAmount =
-                double.tryParse(rawAmount.toString()) ?? selectedAmount;
-          }
-        }
-
-        updateUsdtBalance();
-      });
-    } catch (e) {
-      _setStatus('Error cargando datos: $e', type: 'error');
-    } finally {
-      if (!mounted) return;
+        await _loadPrice();
+        await _loadSignals();
+      }
+    } catch (_) {
       setState(() {
         loading = false;
       });
     }
   }
 
-  Future<void> runBotOnce() async {
-    if (!mounted) return;
-
-    setState(() {
-      runningBot = true;
-      statusMessage = '';
-    });
-
+  Future<void> _loadPrice() async {
     try {
-      final result = await api.runBotOnce(
-        symbol: selectedSymbol,
-        amount: selectedAmount,
+      final res = await http.get(
+        Uri.parse(
+            'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'),
       );
 
-      if (result == null) {
-        _setStatus('Error ejecutando bot', type: 'error');
-        return;
+      final data = jsonDecode(res.body);
+      final price = double.tryParse(data['price'].toString()) ?? 0;
+
+      if (price > 0 && mounted) {
+        setState(() {
+          btcPrices.add(price);
+          if (btcPrices.length > 50) btcPrices.removeAt(0);
+        });
       }
-
-      final mode = result['mode']?.toString() ?? 'ok';
-      _setStatus('Run once ejecutado: $mode', type: 'success');
-
-      await loadData();
-    } catch (e) {
-      _setStatus('Error ejecutando bot: $e', type: 'error');
-    } finally {
-      if (!mounted) return;
-      setState(() {
-        runningBot = false;
-      });
-    }
+    } catch (_) {}
   }
 
-  Future<void> toggleBot(bool value) async {
-    if (!mounted) return;
-
-    setState(() {
-      togglingBot = true;
-      statusMessage = '';
-    });
-
+  Future<void> _loadSignals() async {
     try {
-      final ok = await api.toggleBot(enabled: value);
+      final res = await http.get(
+        Uri.parse('$baseUrl/api/orders'),
+        headers: {
+          'Authorization': 'Bearer fe62823e3f876ad1a9cd859fd1518dcd6ee2ac70a06e947b049fafc65d7d59a2',
+        },
+      );
 
-      if (!ok) {
-        _setStatus('No se pudo cambiar el estado del bot', type: 'error');
-        return;
+      if (res.statusCode != 200) return;
+
+      final List data = jsonDecode(res.body);
+
+      final signals = data
+          .where((e) => e['side'] == 'WAIT_BUY')
+          .take(20)
+          .map((e) {
+        final raw = _safeJson(e['raw_response']);
+
+        return BotSignalPoint(
+          trendOk: raw['trend_ok'] == true,
+          momentumOk: raw['momentum_ok'] == true,
+          rsiOk: raw['rsi_ok'] == true,
+          volumeOk: raw['volume_ok'] == true,
+          rsi: _toDouble(raw['rsi']),
+          changePct: _toDouble(raw['change_pct']),
+        );
+      }).toList();
+
+      if (mounted) {
+        setState(() => botSignals = signals);
       }
-
-      setState(() {
-        botActive = value;
-      });
-
-      _setStatus(
-        value ? 'Bot activado correctamente' : 'Bot desactivado correctamente',
-        type: 'success',
-      );
-    } catch (e) {
-      _setStatus('Error cambiando estado del bot: $e', type: 'error');
-    } finally {
-      if (!mounted) return;
-      setState(() {
-        togglingBot = false;
-      });
-    }
+    } catch (_) {}
   }
 
-  Future<void> saveConfig() async {
-    if (!mounted) return;
-
-    setState(() {
-      savingConfig = true;
-      statusMessage = '';
-    });
-
+  Map<String, dynamic> _safeJson(dynamic value) {
     try {
-      final ok = await api.updateBotConfig(
-        symbol: selectedSymbol,
-        amount: selectedAmount,
-        mode: botMode,
-      );
-
-      if (!ok) {
-        _setStatus('No se pudo guardar la configuración', type: 'error');
-        return;
-      }
-
-      _setStatus('Configuración guardada correctamente', type: 'success');
-      await loadData();
-    } catch (e) {
-      _setStatus('Error guardando configuración: $e', type: 'error');
-    } finally {
-      if (!mounted) return;
-      setState(() {
-        savingConfig = false;
-      });
+      if (value == null) return {};
+      if (value is Map) return Map<String, dynamic>.from(value);
+      return jsonDecode(value.toString());
+    } catch (_) {
+      return {};
     }
   }
 
-  Future<void> pickFromDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2030),
-    );
-
-    if (picked != null && mounted) {
-      setState(() {
-        fromDate = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
+  double _toDouble(dynamic v) {
+    if (v == null) return 0;
+    return double.tryParse(v.toString()) ?? 0;
   }
 
-  Future<void> pickToDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2030),
-    );
-
-    if (picked != null && mounted) {
-      setState(() {
-        toDate = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
-  }
-
-  Future<void> filterOrders() async {
-    try {
-      final filtered = await api.getOrders(
-        symbol: selectedSymbol,
-        from: fromDate,
-        to: toDate,
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        orders = filtered;
-      });
-
-      _setStatus('Órdenes filtradas correctamente', type: 'success');
-    } catch (e) {
-      _setStatus('Error filtrando órdenes: $e', type: 'error');
-    }
-  }
-
-  Widget _buildBotHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: botActive
-              ? [Colors.black87, Colors.green.shade600]
-              : [Colors.black87, Colors.grey.shade700],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: botActive
-            ? [
-          BoxShadow(
-            color: Colors.green.withOpacity(0.35),
-            blurRadius: 20,
-            spreadRadius: 2,
-          ),
-        ]
-            : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 450),
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: botActive ? Colors.greenAccent : Colors.white10,
-                ),
-                child: const Icon(
-                  Icons.account_balance_wallet,
-                  color: Colors.white,
-                  size: 34,
-                ),
-              ),
-              Positioned(
-                top: -8,
-                right: -22,
-                child: Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${usdtBalance.toStringAsFixed(2)} USDT',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Bot automático',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  botActive ? 'Activo' : 'Inactivo',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Modo: $botMode',
-                  style: TextStyle(
-                    color: botMode == 'LIVE'
-                        ? Colors.orangeAccent
-                        : Colors.cyanAccent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Símbolo: $selectedSymbol | Monto: ${selectedAmount.toStringAsFixed(0)} USDT',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActions() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Control del bot',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedSymbol,
-                    decoration: const InputDecoration(
-                      labelText: 'Símbolo',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'BTCUSDT',
-                        child: Text('BTCUSDT'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'ETHUSDT',
-                        child: Text('ETHUSDT'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selectedSymbol = value);
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<double>(
-                    value: selectedAmount,
-                    decoration: const InputDecoration(
-                      labelText: 'Monto',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 10.0, child: Text('10 USDT')),
-                      DropdownMenuItem(value: 20.0, child: Text('20 USDT')),
-                      DropdownMenuItem(value: 50.0, child: Text('50 USDT')),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selectedAmount = value);
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: botMode,
-                    decoration: const InputDecoration(
-                      labelText: 'Modo',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'DRY_RUN',
-                        child: Text('DRY_RUN'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'LIVE',
-                        child: Text('LIVE'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => botMode = value);
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: savingConfig ? null : saveConfig,
-                    icon: const Icon(Icons.save),
-                    label: Text(
-                      savingConfig ? 'Guardando...' : 'Guardar config',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Bot ON / OFF'),
-              subtitle: Text(botActive ? 'Bot activo' : 'Bot detenido'),
-              value: botActive,
-              onChanged: togglingBot ? null : toggleBot,
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: loading ? null : loadData,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Recargar'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: runningBot ? null : runBotOnce,
-                  icon: const Icon(Icons.play_arrow),
-                  label: Text(runningBot ? 'Ejecutando...' : 'Run once'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateFilter() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Filtro por fecha',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: pickFromDate,
-                    child: Text(fromDate ?? 'Desde'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: pickToDate,
-                    child: Text(toDate ?? 'Hasta'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                ElevatedButton(
-                  onPressed: filterOrders,
-                  child: const Text('Filtrar'),
-                ),
-                OutlinedButton(
-                  onPressed: () async {
-                    setState(() {
-                      fromDate = null;
-                      toDate = null;
-                    });
-                    await loadData();
-                  },
-                  child: const Text('Limpiar'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBalances() {
-    if (balances.isEmpty) {
-      return const Card(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('No hay balances disponibles'),
-        ),
-      );
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Balances',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: balances.map((b) {
-                final freeValue =
-                    double.tryParse(b.free.toString()) ?? 0.0;
-                final lockedValue =
-                    double.tryParse(b.locked.toString()) ?? 0.0;
-
-                return Container(
-                  width: 165,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 8),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        b.asset,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Free: ${freeValue.toStringAsFixed(8)}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        'Locked: ${lockedValue.toStringAsFixed(8)}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOrdersTable() {
-    if (orders.isEmpty) {
-      return const Card(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('No hay órdenes registradas'),
-        ),
-      );
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: const [
-              DataColumn(label: Text('ID')),
-              DataColumn(label: Text('Symbol')),
-              DataColumn(label: Text('Side')),
-              DataColumn(label: Text('Quote')),
-              DataColumn(label: Text('Qty')),
-              DataColumn(label: Text('Price')),
-              DataColumn(label: Text('Status')),
-              DataColumn(label: Text('Created')),
-            ],
-            rows: orders.map((o) {
-              final quoteSpent =
-                  double.tryParse(o.quoteSpent.toString()) ?? 0.0;
-              final baseQty =
-                  double.tryParse((o.baseQty ?? 0).toString()) ?? 0.0;
-              final price =
-                  double.tryParse((o.price ?? 0).toString()) ?? 0.0;
-
-              return DataRow(
-                cells: [
-                  DataCell(Text(o.id.toString())),
-                  DataCell(Text(o.symbol)),
-                  DataCell(Text(o.side)),
-                  DataCell(Text(quoteSpent.toStringAsFixed(2))),
-                  DataCell(Text(baseQty.toStringAsFixed(8))),
-                  DataCell(Text(price.toStringAsFixed(2))),
-                  DataCell(Text(o.status)),
-                  DataCell(
-                    SizedBox(
-                      width: 180,
-                      child: Text(
-                        o.createdAt,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
+  // =========================
+  // UI
+  // =========================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Crypto Dashboard'),
-      ),
+      appBar: AppBar(title: const Text("Crypto Dashboard")),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-        onRefresh: loadData,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildBotHeader(),
-            const SizedBox(height: 12),
-            _buildActions(),
-            if (statusMessage.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Card(
-                color: _statusCardColor(),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    statusMessage,
-                    style: TextStyle(color: _statusTextColor()),
-                  ),
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            _buildDateFilter(),
-            const SizedBox(height: 12),
-            _buildBalances(),
-            const SizedBox(height: 12),
-            _buildOrdersTable(),
-          ],
+          : ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _statusCard(),
+          const SizedBox(height: 16),
+          _priceCard(),
+          const SizedBox(height: 16),
+          _signalsCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _statusCard() {
+    return Card(
+      child: ListTile(
+        title: Text("Bot: ${botStatus.state.name}"),
+        subtitle: Text(botStatus.message),
+      ),
+    );
+  }
+
+  Widget _priceCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          btcPrices.isEmpty
+              ? "Cargando precio..."
+              : "BTC: ${btcPrices.last.toStringAsFixed(2)}",
         ),
       ),
     );
   }
+
+  Widget _signalsCard() {
+    return Card(
+      child: Column(
+        children: botSignals
+            .map(
+              (s) => ListTile(
+            title: Text(
+                "RSI: ${s.rsi.toStringAsFixed(2)} | Change: ${s.changePct.toStringAsFixed(2)}%"),
+            subtitle: Text(
+              "T:${s.trendOk} M:${s.momentumOk} R:${s.rsiOk} V:${s.volumeOk}",
+            ),
+          ),
+        )
+            .toList(),
+      ),
+    );
+  }
+}
+
+// =========================
+// MODELS
+// =========================
+
+enum BotState { active, waiting, inPosition, error }
+
+class BotStatus {
+  final BotState state;
+  final String message;
+
+  BotStatus({
+    required this.state,
+    required this.message,
+  });
+
+  factory BotStatus.empty() {
+    return BotStatus(
+      state: BotState.waiting,
+      message: "Esperando señal...",
+    );
+  }
+
+  factory BotStatus.fromJson(Map<String, dynamic> json) {
+    final stateText = json['state']?.toString() ?? 'waiting';
+
+    return BotStatus(
+      state: _parse(stateText),
+      message: json['message']?.toString() ?? '',
+    );
+  }
+
+  static BotState _parse(String v) {
+    switch (v) {
+      case 'active':
+        return BotState.active;
+      case 'in_position':
+        return BotState.inPosition;
+      case 'error':
+        return BotState.error;
+      default:
+        return BotState.waiting;
+    }
+  }
+}
+
+class BotSignalPoint {
+  final bool trendOk;
+  final bool momentumOk;
+  final bool rsiOk;
+  final bool volumeOk;
+  final double rsi;
+  final double changePct;
+
+  BotSignalPoint({
+    required this.trendOk,
+    required this.momentumOk,
+    required this.rsiOk,
+    required this.volumeOk,
+    required this.rsi,
+    required this.changePct,
+  });
 }
